@@ -36,19 +36,16 @@
                 catched = 0
                 pac_color="yellow";
                 var cnt = 289;
-                var food_remain = 150;
+                var food_remain = 90;
                 var pacman_remain = 1;
-                lives = 1;
+                lives = 5;
                 start_time= new Date();
 
-                
                 for (var i = 0; i < 18; i++) {
                     board[i] = new Array();
                 }
 
-
                 board[13][1] = 4;
-
                 board[15][4] = 4;
                 board[14][4] = 4;
                 board[16][3] = 4;
@@ -62,7 +59,6 @@
                 board[11][1] = 4;
                 board[10][1] = 4;
                 board[9][1] = 4;
-
 
                 board[10][12] = 4;
                 board[12][12] = 4;
@@ -148,7 +144,7 @@
             function findRandomEmptyCell(board){
              	var i = Math.floor((Math.random() * 9) + 1);
              	var j = Math.floor((Math.random() * 9) + 1);
-    			while(board[i][j]!=0)
+    			while(board[i][j]!=0 && i!=0 && j!=0)
     			{
              		i = Math.floor((Math.random() * 9) + 1);
              		j = Math.floor((Math.random() * 9) + 1);
@@ -191,7 +187,7 @@
                             context.fillStyle = pac_color; //color 
                             context.fill();
                             context.beginPath();
-                            context.arc(center.x + 5, center.y - 15, 4, 0, 2 * Math.PI); // circle
+                            context.arc(center.x + 5, center.y - 13, 4, 0, 2 * Math.PI); // circle
                             context.fillStyle = "black"; //color 
                             context.fill();
                         }
@@ -227,7 +223,6 @@
             }
             function UpdatePositionGhosts(){
                 if(m1_pos.i < shape.i) {
-                    
                     if(board[m1_pos.i+1][m1_pos.j]!=4){
                         board[m1_pos.i][m1_pos.j] = prev;
                         prev = board[m1_pos.i+1][m1_pos.j];
@@ -236,17 +231,25 @@
                     }
                     
                 }
-                else if(board[m1_pos.i][m1_pos.j+1]!=4){
+                else if(m1_pos.j < shape.j){
+                    if(board[m1_pos.i][m1_pos.j+1]!=4){
                         board[m1_pos.i][m1_pos.j] = prev;
                         prev = board[m1_pos.i][m1_pos.j+1];
                         m1_pos.j++;
                         board[m1_pos.i][m1_pos.j]=3;
                     }
+                }
 
                 if((shape.i==m1_pos.i && shape.j==m1_pos.j) || (shape.i==m2_pos.i && shape.j==m2_pos.j)){
+                    board[shape.i][shape.j]=0;
+
                     score-=10;
                     catched++;
                     lives--;
+                    m1_pos.i=0;
+                    m1_pos.j=0;
+                    shape.i=10;
+                    shape.j=10;
                     if(lives==0){
                         window.clearInterval(interval);
                         window.alert("Game lost");
@@ -295,9 +298,16 @@
 
                 //ghost catch
                 if((shape.i==m1_pos.i && shape.j==m1_pos.j) || (shape.i==m2_pos.i && shape.j==m2_pos.j)){
+                    board[shape.i][shape.j]=0;
                     score-=10;
                     catched++;
                     lives--;
+                    m1_pos.i=0;
+                    m1_pos.j=0;
+                    shape.i=10;
+                    shape.j=10;
+                    
+
                     if(lives==0){
                         window.clearInterval(interval);
                         window.alert("Game lost");
