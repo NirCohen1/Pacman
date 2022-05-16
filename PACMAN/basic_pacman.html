@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+    
+    <head></head>
+    
+    <body>SCORE:
+        <input id="lblScore" type="text" />
+        <br/>
+        TIME:
+        <input id="lblTime" type="text" />
+        <br/>
+        <canvas id="canvas" style="border: 5px solid black;" height="740" width="740"></canvas>
+		
+		
+        <script type="text/javascript">
+            var context = canvas.getContext("2d");
+            //random
+            var ghost_num;
+            var balls;
+            var max_time;
+
+            var shape=new Object();
+            var m1_pos=new Object();
+            var m2_pos=new Object();
+            var m3_pos=new Object();
+            var bonus_pos=new Object();
+
+            var special_pos=new Object();
+            var special;
+            var prev;
+            var m1_prev;//if borad[][]==1 before
+            var m2_prev;
+            var m3_prev;
+
+            var lives;
+            var catched; 
+            var board;
+            var score;
+            var pac_color;
+            var start_time;
+            var time_elapsed;    
+            var interval;
+            
+            
+
+		Start();
+			
+            function Start() {
+
+                board = new Array();
+                score = 0;
+                catched = 0
+                pac_color="yellow";
+                var cnt = 288;
+                var food_remain = 90;
+                var pacman_remain = 1;
+                lives = 5;
+                start_time= new Date();
+                special=1;
+
+            board = [
+            [4, 4, 4, 4, 4 ,4 ,4 ,0 ,0, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+            [4, 3, 0, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 4, 4, 4 ,0 ,4 ,4 ,4, 0, 4, 4, 4, 0, 4, 4, 0, 4],
+            [4, 0, 4, 0, 0 ,0 ,4 ,0 ,4, 0, 4, 0, 4, 0, 0, 0, 0, 4],
+            [4, 0, 4, 0, 4 ,4 ,4 ,0 ,0, 0, 0, 0, 4, 4, 4, 0, 0, 4],
+            [4, 0, 4, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 4, 4, 4 ,4 ,4 ,0 ,4, 0, 4, 0, 4, 4, 4, 4, 0, 4],
+            [4, 0, 0, 0, 0 ,0 ,0 ,0 ,4, 0, 4, 0, 0, 0, 0, 4, 0, 4],
+            [4, 0, 4, 0, 4 ,0 ,4 ,0 ,4, 0, 4, 0, 4, 4, 0, 4, 0, 4],
+            [4, 0, 4, 0, 4 ,0 ,4 ,0 ,4, 0, 4, 0, 4, 0, 0, 4, 0, 4],
+            [4, 0, 0, 0, 0 ,0 ,0 ,0 ,4, 0, 4, 0, 4, 0, 0, 4, 0, 4],
+            [4, 0, 4, 4, 4 ,4 ,4 ,0 ,4, 0, 4, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 4, 0, 0 ,0 ,0 ,0 ,4, 0, 4, 0, 4, 4, 4, 4, 0, 4],
+            [4, 0, 4, 0, 4 ,4 ,4 ,0 ,4, 0, 0, 0, 4, 0, 0, 0, 0, 4],
+            [4, 0, 4, 0, 0 ,0 ,4 ,0 ,0, 0, 4, 4, 4, 0, 4, 4, 0, 4],
+            [4, 0, 4, 4, 4 ,0 ,4 ,4 ,4, 0, 4, 0, 0, 0, 4, 4, 0, 4],
+            [4, 6, 0, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 5, 4],
+            [4, 4, 4, 4, 4, 4, 4, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        ]            
+                //ghosts
+                m1_pos.i=1;
+                m1_pos.j=1;
+
+                m2_pos.i=16;
+                m2_pos.j=16;
+                
+                for (var i = 0; i < 18; i++) {
+                    for (var j = 0; j < 18; j++) {
+                        if(board[i][j]==4 || board[i][j]==3 || board[i][j]==5 || board[i][j]==6){
+                            continue;
+                        }
+                        else{
+                            var randomNum = Math.random();
+                            if (randomNum <= 1.0 * food_remain / cnt) {
+                                food_remain--;
+                                board[i][j] = 1;
+                            } else if (randomNum < 1.0 * (pacman_remain + food_remain) / cnt) {
+                                shape.i=i;
+                                shape.j=j;
+                                pacman_remain--;
+                                board[i][j] = 2;
+                            } else {
+                                board[i][j] = 0;
+                            }
+                            cnt--;
+                        }
+                    }
+                }
+                while(food_remain > 0){
+					var emptyCell = findRandomEmptyCell(board);
+					board[emptyCell[0]][emptyCell[1]] = 1;
+					food_remain--;
+                }
+                keysDown = {};
+                addEventListener("keydown", function (e) {
+                    keysDown[e.keyCode] = true;
+                }, false);
+                addEventListener("keyup", function (e) {
+                    keysDown[e.keyCode] = false;
+                }, false);
+                interval=setInterval(UpdatePosition, 150);
+                interval=setInterval(UpdatePositionGhosts, 600);
+            }
+            function findRandomEmptyCell(board){
+             	var i = Math.floor((Math.random() * 9) + 1);
+             	var j = Math.floor((Math.random() * 9) + 1);
+    			while(board[i][j]!=0 && board[i][j]!=1 && board[i][j]!=3 && board[i][j]!=4 && board[i][j]!=5 && board[i][j]!=4)
+    			{
+             		i = Math.floor((Math.random() * 9) + 1);
+             		j = Math.floor((Math.random() * 9) + 1);
+    			}
+                return [i,j];             
+            }
+            function GetKeyPressed() {
+                if (keysDown[38]) {
+                    return 1;
+                }
+                if (keysDown[40]) { 
+                    return 2;
+                }
+                if (keysDown[37]) { 
+                    return 3;
+                }
+                if (keysDown[39]) { 
+                    return 4;
+                }
+            }
+
+            function Randomize() {
+                ghost_num = Math.floor(Math.random() * 4);
+                balls = Math.floor(Math.random() * 51) + 40;
+                max_time = 60 + Math.floor(Math.random() * 150);
+            }
+
+
+            function Draw() {
+            	canvas.width=canvas.width; //clean board
+                lblScore.value = score;
+                lblTime.value = time_elapsed;
+
+                context.fillStyle = "black";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                
+                for (var i = 0; i < 18; i++) {
+                    for (var j = 0; j < 18; j++) {
+                        var center = new Object();
+                        center.x = i * 40 + 30;
+                        center.y = j * 40 + 30;
+
+                        if (board[i][j] == 2) {
+                            context.beginPath();
+                            context.arc(center.x, center.y, 20, 0.15 * Math.PI, 1.85 * Math.PI); // half circle
+                            context.lineTo(center.x, center.y);
+                            context.fillStyle = pac_color; //color 
+                            context.fill();
+                            context.beginPath();
+                            context.arc(center.x + 5, center.y - 13, 4, 0, 2 * Math.PI); // circle
+                            context.fillStyle = "black"; //color 
+                            context.fill();
+                        }
+                        else if (board[i][j] == 1) {
+                            context.beginPath();
+                            context.arc(center.x, center.y, 10, 0, 2 * Math.PI); // circle
+                            context.fillStyle = "white"; //color 
+                            context.fill();
+                        }
+                        else if (board[i][j] == 3) {
+                            base_image = new Image();
+                            base_image.src = 'ghost.png';
+                            context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
+                        }
+                        else if (board[i][j] == 4) {
+
+                            base_image = new Image();
+                            base_image.src = 'wall7.png';
+                            context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
+                        }
+                        else if (board[i][j] == 5) {
+                            base_image = new Image();
+                            base_image.src = 'ghost1.png';
+                            context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
+                        }
+                        else if (board[i][j] == 6) {
+                            base_image = new Image();
+                            base_image.src = 'ghost2.png';
+                            context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
+                        }
+                    }
+                }
+            }
+            function UpdatePositionGhosts(){
+                if(m1_pos.i < shape.i && board[m1_pos.i+1][m1_pos.j]!=4 && board[m1_pos.i+1][m1_pos.j]!=5 && board[m1_pos.i+1][m1_pos.j]!=6) {
+                        board[m1_pos.i][m1_pos.j] = prev;
+                        prev = board[m1_pos.i+1][m1_pos.j];
+                        m1_pos.i++;
+                        board[m1_pos.i][m1_pos.j]=3;
+                }
+                else if(m1_pos.j < shape.j && board[m1_pos.i][m1_pos.j+1]!=4 && board[m1_pos.i+1][m1_pos.j]!=5 && board[m1_pos.i+1][m1_pos.j]!=6){
+                    board[m1_pos.i][m1_pos.j] = prev;
+                    prev = board[m1_pos.i][m1_pos.j+1];
+                    m1_pos.j++;
+                    board[m1_pos.i][m1_pos.j]=3;
+                }
+                else if(m1_pos.i > shape.i){
+                    if(board[m1_pos.i-1][m1_pos.j]!=4 && board[m1_pos.i+1][m1_pos.j]!=5 && board[m1_pos.i+1][m1_pos.j]!=6){
+                        board[m1_pos.i][m1_pos.j] = prev;
+                        prev = board[m1_pos.i-1][m1_pos.j];
+                        m1_pos.i--;
+                        board[m1_pos.i][m1_pos.j]=3;
+                    }
+                }
+                if(prev==2){
+                    prev=0;
+                }
+            }
+
+            function UpdatePosition() {
+            	board[shape.i][shape.j]=0;
+                var x = GetKeyPressed()
+                if(x==1)
+                {
+                	if(shape.j>0 && board[shape.i][shape.j-1]!=4)
+                	{
+                		shape.j--;
+                	}
+                }
+                if(x==2)
+                {
+                	if(shape.j<17 && board[shape.i][shape.j+1]!=4)
+                	{
+                		shape.j++;
+                	}
+                }
+                if(x==3)
+                {
+                	if(shape.i>0 && board[shape.i-1][shape.j]!=4)
+                	{
+                		shape.i--;
+                	}
+                }
+                if(x==4)
+                {
+                	if(shape.i<17 && board[shape.i+1][shape.j]!=4)
+                	{
+                		shape.i++;
+                	}
+                }
+                if(board[shape.i][shape.j]==1)
+                {
+                	score++;
+                }
+                board[shape.i][shape.j]=2;
+                var currentTime=new Date();
+                time_elapsed=(currentTime-start_time)/1000;
+
+                //ghost catch
+                if((shape.i==m1_pos.i && shape.j==m1_pos.j) || (shape.i==m2_pos.i && shape.j==m2_pos.j) || ((shape.i==m3_pos.i && shape.j==m3_pos.j))){
+                    board[shape.i][shape.j] = 0;
+                    board[m1_pos.i][m1_pos.j] = 0;
+                    score-=10;
+                    catched++;
+                    lives--;
+                    m1_pos.i=1;
+                    m1_pos.j=1;
+                    board[m1_pos.i][m1_pos.j] = 3;
+                    var emptyCell = findRandomEmptyCell(board);
+                    shape.i=emptyCell[0];
+                    shape.j=emptyCell[1];
+                    if(lives==0){
+                        window.clearInterval(interval);
+                        window.alert("Game lost");
+                    }
+                }
+
+            	if(score>=20&&time_elapsed<=10)
+            	{
+            		pac_color="green";
+            	}
+            	if(score==(150-10*catched))
+            	{
+            		window.clearInterval(interval);
+            		window.alert("Game completed");
+            	}
+            	else
+            	{
+            		Draw();
+            	}
+            }
+            // document.addEventListener('DOMContentLoaded', (event) => {
+            //     Start();
+            // });
+        </script>
+    </body>
+    
+</html>
