@@ -20,10 +20,10 @@
             var max_time;
 
             var shape=new Object();
-            var m1_pos=new Object();
-            var m2_pos=new Object();
-            var m3_pos=new Object();
-            var bonus_pos=new Object();
+            var m1_pos=new Object(); //Position of First Ghost
+            var m2_pos=new Object(); //Position of Second Ghost
+            var m3_pos=new Object(); //Position of Third Ghost
+            var bonus_pos=new Object(); 
 
             var special_pos=new Object();
             var special;
@@ -46,17 +46,25 @@
 		Start();
 			
             function Start() {
-
-                board = new Array();
-                score = 0;
-                catched = 0
-                pac_color="yellow";
-                var cnt = 288;
-                var food_remain = 90;
-                var pacman_remain = 1;
-                lives = 5;
-                start_time= new Date();
-                special=1;
+             /*
+                Movement: ArrowUp,ArrowDown,ArrowLeft,ArrowRight
+                food: 90
+                FirstBall Color1 num1 num1Points
+                SecondBall Color2 num2 num2Points
+                ThirdBall Color2 num3 num3Points
+                GameTime: x seconds
+                Ghosts: 3
+            */
+            board = new Array();
+            score = 0;
+            catched = 0
+            pac_color="yellow";
+            var cnt = 288;
+            var food_remain = 90;
+            var pacman_remain = 1;
+            lives = 5;
+            start_time= new Date();
+            special=1;
 
             board = [
             [4, 4, 4, 4, 4 ,4 ,4 ,0 ,0, 4, 4, 4, 4, 4, 4, 4, 4, 4],
@@ -77,51 +85,63 @@
             [4, 0, 4, 4, 4 ,0 ,4 ,4 ,4, 0, 4, 0, 0, 0, 4, 4, 0, 4],
             [4, 6, 0, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 5, 4],
             [4, 4, 4, 4, 4, 4, 4, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4]
-        ]            
-                //ghosts
-                m1_pos.i=1;
-                m1_pos.j=1;
+            ]
+                        
+            //Ghosts start in corner
+            m1_pos.i=1;
+            m1_pos.j=1;
 
-                m2_pos.i=16;
-                m2_pos.j=16;
-                
-                for (var i = 0; i < 18; i++) {
-                    for (var j = 0; j < 18; j++) {
-                        if(board[i][j]==4 || board[i][j]==3 || board[i][j]==5 || board[i][j]==6){
-                            continue;
+            m2_pos.i=16;
+            m2_pos.j=16;
+            
+            
+            /*
+            1 = food
+            2 = pacman
+            3,5,6 = ghosts
+            4 = wall
+            */
+            for (var i = 0; i < 18; i++) { //18 is the number of rows and columns
+                for (var j = 0; j < 18; j++) {
+                    if(board[i][j]==4 || board[i][j]==3 || board[i][j]==5 || board[i][j]==6){
+                        continue;
+                    }
+                    //place food and pacman
+                    else{
+                        var randomNum = Math.random();
+                        if (randomNum <= 1.0 * food_remain / cnt) {
+                            food_remain--;
+                            board[i][j] = 1;
+                        } else if (randomNum < 1.0 * (pacman_remain + food_remain) / cnt) {
+                            shape.i=i;
+                            shape.j=j;
+                            pacman_remain--;
+                            board[i][j] = 2;
+                        } else {
+                            board[i][j] = 0;
                         }
-                        else{
-                            var randomNum = Math.random();
-                            if (randomNum <= 1.0 * food_remain / cnt) {
-                                food_remain--;
-                                board[i][j] = 1;
-                            } else if (randomNum < 1.0 * (pacman_remain + food_remain) / cnt) {
-                                shape.i=i;
-                                shape.j=j;
-                                pacman_remain--;
-                                board[i][j] = 2;
-                            } else {
-                                board[i][j] = 0;
-                            }
-                            cnt--;
-                        }
+                        cnt--;
                     }
                 }
-                while(food_remain > 0){
-					var emptyCell = findRandomEmptyCell(board);
-					board[emptyCell[0]][emptyCell[1]] = 1;
-					food_remain--;
-                }
-                keysDown = {};
-                addEventListener("keydown", function (e) {
-                    keysDown[e.keyCode] = true;
-                }, false);
-                addEventListener("keyup", function (e) {
-                    keysDown[e.keyCode] = false;
-                }, false);
-                interval=setInterval(UpdatePosition, 150);
-                interval=setInterval(UpdatePositionGhosts, 600);
             }
+
+            while(food_remain > 0){
+                var emptyCell = findRandomEmptyCell(board);
+                board[emptyCell[0]][emptyCell[1]] = 1;
+                food_remain--;
+            }
+            keysDown = {};
+            addEventListener("keydown", function (e) {
+                keysDown[e.keyCode] = true;
+            }, false);
+            addEventListener("keyup", function (e) {
+                keysDown[e.keyCode] = false;
+            }, false);
+            interval=setInterval(UpdatePosition, 150);
+            interval=setInterval(UpdatePositionGhosts, 600);
+                }
+            
+            //Find Cells For the food
             function findRandomEmptyCell(board){
              	var i = Math.floor((Math.random() * 9) + 1);
              	var j = Math.floor((Math.random() * 9) + 1);
@@ -132,21 +152,28 @@
     			}
                 return [i,j];             
             }
+
+            //Receive as input the key on which the user clicks and return value accordingly
             function GetKeyPressed() {
+                //ArrowUp
                 if (keysDown[38]) {
                     return 1;
                 }
+                //ArrowDown
                 if (keysDown[40]) { 
                     return 2;
                 }
+                //ArrowLeft
                 if (keysDown[37]) { 
                     return 3;
                 }
+                //ArrowRight
                 if (keysDown[39]) { 
                     return 4;
                 }
             }
 
+            //Allow the user to enter random game values
             function Randomize() {
                 ghost_num = Math.floor(Math.random() * 4);
                 balls = Math.floor(Math.random() * 51) + 40;
@@ -168,6 +195,7 @@
                         center.x = i * 40 + 30;
                         center.y = j * 40 + 30;
 
+                        //draw pacman
                         if (board[i][j] == 2) {
                             context.beginPath();
                             context.arc(center.x, center.y, 20, 0.15 * Math.PI, 1.85 * Math.PI); // half circle
@@ -179,36 +207,43 @@
                             context.fillStyle = "black"; //color 
                             context.fill();
                         }
+                        //draw foods
                         else if (board[i][j] == 1) {
                             context.beginPath();
                             context.arc(center.x, center.y, 10, 0, 2 * Math.PI); // circle
                             context.fillStyle = "white"; //color 
                             context.fill();
                         }
+                        //draw Ghost1
                         else if (board[i][j] == 3) {
                             base_image = new Image();
-                            base_image.src = 'ghost.png';
+                            base_image.src = 'ghost1.png';
                             context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
                         }
+                        //draw Wall
                         else if (board[i][j] == 4) {
 
                             base_image = new Image();
                             base_image.src = 'wall7.png';
                             context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
                         }
+                        //draw Ghost2
                         else if (board[i][j] == 5) {
                             base_image = new Image();
-                            base_image.src = 'ghost1.png';
+                            base_image.src = 'ghost2.png';
                             context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
                         }
+                        //draw Ghost3
                         else if (board[i][j] == 6) {
                             base_image = new Image();
-                            base_image.src = 'ghost2.png';
+                            base_image.src = 'ghost3.png';
                             context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
                         }
                     }
                 }
             }
+
+            //Makes the ghosts chase Pacman
             function UpdatePositionGhosts(){
                 if(m1_pos.i < shape.i && board[m1_pos.i+1][m1_pos.j]!=4 && board[m1_pos.i+1][m1_pos.j]!=5 && board[m1_pos.i+1][m1_pos.j]!=6) {
                         board[m1_pos.i][m1_pos.j] = prev;
@@ -235,9 +270,13 @@
                 }
             }
 
+            /* Update the position of pacman according
+            to what key has been pressed
+            */
             function UpdatePosition() {
             	board[shape.i][shape.j]=0;
                 var x = GetKeyPressed()
+                //Move Pacman Up
                 if(x==1)
                 {
                 	if(shape.j>0 && board[shape.i][shape.j-1]!=4)
@@ -245,6 +284,7 @@
                 		shape.j--;
                 	}
                 }
+                //Move Pacman Down
                 if(x==2)
                 {
                 	if(shape.j<17 && board[shape.i][shape.j+1]!=4)
@@ -252,6 +292,7 @@
                 		shape.j++;
                 	}
                 }
+                //Move Pacman To The Right
                 if(x==3)
                 {
                 	if(shape.i>0 && board[shape.i-1][shape.j]!=4)
@@ -259,6 +300,7 @@
                 		shape.i--;
                 	}
                 }
+                //Move Pacman To The Left
                 if(x==4)
                 {
                 	if(shape.i<17 && board[shape.i+1][shape.j]!=4)
@@ -266,15 +308,18 @@
                 		shape.i++;
                 	}
                 }
+                //Pacman moves to a place where there is food
                 if(board[shape.i][shape.j]==1)
                 {
                 	score++;
                 }
-                board[shape.i][shape.j]=2;
+                board[shape.i][shape.j]=2; //Draw pacman in his new position
                 var currentTime=new Date();
                 time_elapsed=(currentTime-start_time)/1000;
 
-                //ghost catch
+                /*
+                In case of a ghost catching pacman
+                */
                 if((shape.i==m1_pos.i && shape.j==m1_pos.j) || (shape.i==m2_pos.i && shape.j==m2_pos.j) || ((shape.i==m3_pos.i && shape.j==m3_pos.j))){
                     board[shape.i][shape.j] = 0;
                     board[m1_pos.i][m1_pos.j] = 0;
