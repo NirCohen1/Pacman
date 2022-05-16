@@ -14,9 +14,25 @@
 		
         <script type="text/javascript">
             var context = canvas.getContext("2d");
+            //random
+            var ghost_num;
+            var balls;
+            var max_time;
+
             var shape=new Object();
             var m1_pos=new Object();
             var m2_pos=new Object();
+            var m3_pos=new Object();
+            var bonus_pos=new Object();
+
+            var special_pos=new Object();
+            var special;
+            var prev;
+            var m1_prev;//if borad[][]==1 before
+            var m2_prev;
+            var m3_prev;
+
+
             var lives;
             var catched; 
             var board;
@@ -25,9 +41,10 @@
             var start_time;
             var time_elapsed;    
             var interval;
-            var prev;
+            
+            
 
-		Start();
+		// Start();
 			
             function Start() {
 
@@ -40,72 +57,38 @@
                 var pacman_remain = 1;
                 lives = 5;
                 start_time= new Date();
+                special=1;
 
-                for (var i = 0; i < 18; i++) {
-                    board[i] = new Array();
-                }
-
-                board[13][1] = 4;
-                board[15][4] = 4;
-                board[14][4] = 4;
-                board[16][3] = 4;
-                board[16][2] = 4;
-                board[16][1] = 4;
-                board[16][4] = 4;
-
-                board[11][4] = 4;
-                board[11][3] = 4;
-                board[11][2] = 4;
-                board[11][1] = 4;
-                board[10][1] = 4;
-                board[9][1] = 4;
-
-                board[10][12] = 4;
-                board[12][12] = 4;
-                board[16][13] = 4;
-                board[16][16] = 4;
-                board[3][3] = 4;
-                board[3][4] = 4;
-                board[6][1] = 4;
-                board[3][5] = 4;
-                board[6][2] = 4;
-                board[14][15] = 4;
-                board[11][11] = 4;
-                board[2][17] = 4;
-                board[3][16] = 4;
-                board[10][9] = 4;
-                board[10][10] = 4;
-                board[1][10] = 4;
-                board[2][10] = 4;
-                board[3][10] = 4;
-                board[4][10] = 4;
-                board[5][10] = 4;
-                board[6][10] = 4;
-                board[7][10] = 4;
-                board[8][10] = 4;
-                board[8][9] = 4;
-                board[8][11] = 4;
-                board[8][12] = 4;
-                board[8][13] = 4;
-                board[8][14] = 4;
-                board[7][14] = 4;
-                board[4][17] = 4;
-                
+            board = [
+            [4, 4, 4, 4, 4 ,4 ,4 ,0 ,0, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+            [4, 3, 0, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 4, 4, 4 ,0 ,4 ,4 ,4, 0, 4, 4, 4, 0, 4, 4, 0, 4],
+            [4, 0, 4, 0, 0 ,0 ,4 ,0 ,4, 0, 4, 0, 4, 0, 0, 0, 0, 4],
+            [4, 0, 4, 0, 4 ,4 ,4 ,0 ,0, 0, 0, 0, 4, 4, 4, 0, 0, 4],
+            [4, 0, 4, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 4, 4, 4 ,4 ,4 ,0 ,4, 0, 4, 0, 4, 4, 4, 4, 0, 4],
+            [4, 0, 0, 0, 0 ,0 ,0 ,0 ,4, 0, 4, 0, 0, 0, 0, 4, 0, 4],
+            [4, 0, 4, 0, 4 ,0 ,4 ,0 ,4, 0, 4, 0, 4, 4, 0, 4, 0, 4],
+            [4, 0, 4, 0, 4 ,0 ,4 ,0 ,4, 0, 4, 0, 4, 0, 0, 4, 0, 4],
+            [4, 0, 0, 0, 0 ,0 ,0 ,0 ,4, 0, 4, 0, 4, 0, 0, 4, 0, 4],
+            [4, 0, 4, 4, 4 ,4 ,4 ,0 ,4, 0, 4, 0, 0, 0, 0, 0, 0, 4],
+            [4, 0, 4, 0, 0 ,0 ,0 ,0 ,4, 0, 4, 0, 4, 4, 4, 4, 0, 4],
+            [4, 0, 4, 0, 4 ,4 ,4 ,0 ,4, 0, 0, 0, 4, 0, 0, 0, 0, 4],
+            [4, 0, 4, 0, 0 ,0 ,4 ,0 ,0, 0, 4, 4, 4, 0, 4, 4, 0, 4],
+            [4, 0, 4, 4, 4 ,0 ,4 ,4 ,4, 0, 4, 0, 0, 0, 4, 4, 0, 4],
+            [4, 6, 0, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 5, 4],
+            [4, 4, 4, 4, 4, 4, 4, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        ]            
                 //ghosts
-                m1_pos.i=0;
-                m1_pos.j=0;
+                m1_pos.i=1;
+                m1_pos.j=1;
 
-                m2_pos.i=17;
-                m2_pos.j=17;
-
-                board[0][0] = 3;
-                board[17][17] = 5;
-                board[0][17] = 6;
-
+                m2_pos.i=16;
+                m2_pos.j=16;
                 
                 for (var i = 0; i < 18; i++) {
                     for (var j = 0; j < 18; j++) {
-                        if(board[i][j]==4 || board[i][j]==3 || board[i][j]==4 || board[i][j]==5 || board[i][j]==6){
+                        if(board[i][j]==4 || board[i][j]==3 || board[i][j]==5 || board[i][j]==6){
                             continue;
                         }
                         else{
@@ -125,7 +108,7 @@
                         }
                     }
                 }
-                while(food_remain>0){
+                while(food_remain > 0){
 					var emptyCell = findRandomEmptyCell(board);
 					board[emptyCell[0]][emptyCell[1]] = 1;
 					food_remain--;
@@ -166,12 +149,19 @@
                 }
             }
 
+            function Randomize() {
+                ghost_num = Math.floor(Math.random() * 4);
+                balls = Math.floor(Math.random() * 51) + 40;
+                max_time = 60 + Math.floor(Math.random() * 150);
+            }
+
+
             function Draw() {
             	canvas.width=canvas.width; //clean board
                 lblScore.value = score;
                 lblTime.value = time_elapsed;
 
-                context.fillStyle = "darkolivegreen";
+                context.fillStyle = "black";
                 context.fillRect(0, 0, canvas.width, canvas.height);
                 
                 for (var i = 0; i < 18; i++) {
@@ -194,18 +184,18 @@
                         else if (board[i][j] == 1) {
                             context.beginPath();
                             context.arc(center.x, center.y, 10, 0, 2 * Math.PI); // circle
-                            context.fillStyle = "black"; //color 
-                            context.fill();
-                        }
-                        else if (board[i][j] == 4) {
-                            context.beginPath();
-                            context.rect(center.x-20, center.y-20, 40, 40);
-                            context.fillStyle = "grey"; //color 
+                            context.fillStyle = "white"; //color 
                             context.fill();
                         }
                         else if (board[i][j] == 3) {
                             base_image = new Image();
                             base_image.src = 'ghost.png';
+                            context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
+                        }
+                        else if (board[i][j] == 4) {
+
+                            base_image = new Image();
+                            base_image.src = 'wall7.png';
                             context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
                         }
                         else if (board[i][j] == 5) {
@@ -222,38 +212,28 @@
                 }
             }
             function UpdatePositionGhosts(){
-                if(m1_pos.i < shape.i) {
-                    if(board[m1_pos.i+1][m1_pos.j]!=4){
+                if(m1_pos.i < shape.i && board[m1_pos.i+1][m1_pos.j]!=4 && board[m1_pos.i+1][m1_pos.j]!=5 && board[m1_pos.i+1][m1_pos.j]!=6) {
                         board[m1_pos.i][m1_pos.j] = prev;
                         prev = board[m1_pos.i+1][m1_pos.j];
                         m1_pos.i++;
                         board[m1_pos.i][m1_pos.j]=3;
-                    }
-                    
                 }
-                else if(m1_pos.j < shape.j){
-                    if(board[m1_pos.i][m1_pos.j+1]!=4){
+                else if(m1_pos.j < shape.j && board[m1_pos.i][m1_pos.j+1]!=4 && board[m1_pos.i+1][m1_pos.j]!=5 && board[m1_pos.i+1][m1_pos.j]!=6){
+                    board[m1_pos.i][m1_pos.j] = prev;
+                    prev = board[m1_pos.i][m1_pos.j+1];
+                    m1_pos.j++;
+                    board[m1_pos.i][m1_pos.j]=3;
+                }
+                else if(m1_pos.i > shape.i){
+                    if(board[m1_pos.i-1][m1_pos.j]!=4 && board[m1_pos.i+1][m1_pos.j]!=5 && board[m1_pos.i+1][m1_pos.j]!=6){
                         board[m1_pos.i][m1_pos.j] = prev;
-                        prev = board[m1_pos.i][m1_pos.j+1];
-                        m1_pos.j++;
+                        prev = board[m1_pos.i-1][m1_pos.j];
+                        m1_pos.i--;
                         board[m1_pos.i][m1_pos.j]=3;
                     }
                 }
-
-                if((shape.i==m1_pos.i && shape.j==m1_pos.j) || (shape.i==m2_pos.i && shape.j==m2_pos.j)){
-                    board[shape.i][shape.j]=0;
-
-                    score-=10;
-                    catched++;
-                    lives--;
-                    m1_pos.i=0;
-                    m1_pos.j=0;
-                    shape.i=10;
-                    shape.j=10;
-                    if(lives==0){
-                        window.clearInterval(interval);
-                        window.alert("Game lost");
-                    }
+                if(prev==2){
+                    prev=0;
                 }
             }
 
@@ -297,17 +277,18 @@
                 time_elapsed=(currentTime-start_time)/1000;
 
                 //ghost catch
-                if((shape.i==m1_pos.i && shape.j==m1_pos.j) || (shape.i==m2_pos.i && shape.j==m2_pos.j)){
-                    board[shape.i][shape.j]=0;
+                if((shape.i==m1_pos.i && shape.j==m1_pos.j) || (shape.i==m2_pos.i && shape.j==m2_pos.j) || ((shape.i==m3_pos.i && shape.j==m3_pos.j))){
+                    board[shape.i][shape.j] = 0;
+                    board[m1_pos.i][m1_pos.j] = 0;
                     score-=10;
                     catched++;
                     lives--;
-                    m1_pos.i=0;
-                    m1_pos.j=0;
-                    shape.i=10;
-                    shape.j=10;
-                    
-
+                    m1_pos.i=1;
+                    m1_pos.j=1;
+                    board[m1_pos.i][m1_pos.j] = 3;
+                    var emptyCell = findRandomEmptyCell(board);
+                    shape.i=emptyCell[0];
+                    shape.j=emptyCell[1];
                     if(lives==0){
                         window.clearInterval(interval);
                         window.alert("Game lost");
@@ -328,8 +309,7 @@
             		Draw();
             	}
             }
-
         </script>
     </body>
-
+    
 </html>
