@@ -18,7 +18,7 @@
             var ghost_num;
             var balls;
             var max_time;
-
+            var m_pac_direction = 4;
             var shape=new Object();
             var m1_pos=new Object(); //Position of First Ghost
             var m2_pos=new Object(); //Position of Second Ghost
@@ -197,15 +197,54 @@
 
                         //draw pacman
                         if (board[i][j] == 2) {
-                            context.beginPath();
-                            context.arc(center.x, center.y, 20, 0.15 * Math.PI, 1.85 * Math.PI); // half circle
-                            context.lineTo(center.x, center.y);
-                            context.fillStyle = pac_color; //color 
-                            context.fill();
-                            context.beginPath();
-                            context.arc(center.x + 5, center.y - 13, 4, 0, 2 * Math.PI); // circle
-                            context.fillStyle = "black"; //color 
-                            context.fill();
+//UP
+if(m_pac_direction == 1){
+                                context.beginPath();
+                                context.arc(center.x, center.y, 20, 1.85 * Math.PI, 1.45 * Math.PI); // half circle
+                                context.lineTo(center.x, center.y);
+                                context.fillStyle = pac_color; //color 
+                                context.fill();
+                                context.beginPath();
+                                context.arc(center.x - 5, center.y + 13, 4, 0, 2 * Math.PI); // circle
+                                context.fillStyle = "black"; //color 
+                                context.fill();
+                            }
+                            //Down
+                            if(m_pac_direction == 2){
+                                context.beginPath();
+                                context.arc(center.x, center.y, 20, 0.6 * Math.PI, 0.3 * Math.PI); // half circle
+                                context.lineTo(center.x, center.y);
+                                context.fillStyle = pac_color; //color 
+                                context.fill();
+                                context.beginPath();
+                                context.arc(center.x + 5, center.y - 13, 4, 0, 2 * Math.PI); // circle
+                                context.fillStyle = "black"; //color 
+                                context.fill();
+                            }
+                            //Left
+                            if(m_pac_direction == 3){
+                                context.beginPath();
+                                context.arc(center.x, center.y, 20, 1.15 * Math.PI, 0.85 * Math.PI); // half circle
+                                context.lineTo(center.x, center.y);
+                                context.fillStyle = pac_color; //color 
+                                context.fill();
+                                context.beginPath();
+                                context.arc(center.x + 5, center.y - 13, 4, 0, 2 * Math.PI); // circle
+                                context.fillStyle = "black"; //color 
+                                context.fill();
+                            }
+                            //Right
+                            if(m_pac_direction == 4){
+                                context.beginPath();
+                                context.arc(center.x, center.y, 20, 0.15 * Math.PI, 1.85 * Math.PI); // half circle
+                                context.lineTo(center.x, center.y);
+                                context.fillStyle = pac_color; //color 
+                                context.fill();
+                                context.beginPath();
+                                context.arc(center.x + 5, center.y - 13, 4, 0, 2 * Math.PI); // circle
+                                context.fillStyle = "black"; //color 
+                                context.fill();
+                            }
                         }
                         //draw foods
                         else if (board[i][j] == 1) {
@@ -282,6 +321,7 @@
                 	if(shape.j>0 && board[shape.i][shape.j-1]!=4)
                 	{
                 		shape.j--;
+                        m_pac_direction = 1;
                 	}
                 }
                 //Move Pacman Down
@@ -290,6 +330,7 @@
                 	if(shape.j<17 && board[shape.i][shape.j+1]!=4)
                 	{
                 		shape.j++;
+                        m_pac_direction = 2;
                 	}
                 }
                 //Move Pacman To The Right
@@ -298,6 +339,7 @@
                 	if(shape.i>0 && board[shape.i-1][shape.j]!=4)
                 	{
                 		shape.i--;
+                        m_pac_direction = 3;
                 	}
                 }
                 //Move Pacman To The Left
@@ -306,6 +348,7 @@
                 	if(shape.i<17 && board[shape.i+1][shape.j]!=4)
                 	{
                 		shape.i++;
+                        m_pac_direction = 4;
                 	}
                 }
                 //Pacman moves to a place where there is food
