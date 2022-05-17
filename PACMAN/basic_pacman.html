@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html>
-    
     <head></head>
     
     <body>SCORE:
         <input id="lblScore" type="text" />
-        <br/>
         TIME:
         <input id="lblTime" type="text" />
+        Lives Left:
+        <input id="LivesLeft" type="text" />
         <br/>
         <canvas id="canvas" style="border: 5px solid black;" height="740" width="740"></canvas>
-		
-		
+        <audio id="DBGT" src="DAN DAN DBGT.mp3"></audio>
+        <audio id="GameOver" src="Naruto sadness and sorrow.mp3"></audio>
+        <audio id="GameWon" src="Intro.mp3"></audio>
+        <button onclick="playMusic()">Play Music</button>
         <script type="text/javascript">
+
             var context = canvas.getContext("2d");
             //random
             var ghost_num;
@@ -24,7 +27,7 @@
             var m2_pos=new Object(); //Position of Second Ghost
             var m3_pos=new Object(); //Position of Third Ghost
             var bonus_pos=new Object(); 
-
+            
             var special_pos=new Object();
             var special;
             var prev;
@@ -46,13 +49,17 @@
             var m_GreenScore = 15; 
             var m_DragonScore = 25;
 
+            //has the game been completed
+            var m_game_won = false;
+            var m_game_over = false;
+
 
             
             
 
 		Start();
-			
             function Start() {
+             playMusic();
              /*
                 Movement: ArrowUp,ArrowDown,ArrowLeft,ArrowRight
                 food: 90
@@ -167,22 +174,16 @@
                     board[emptyCell[0]][emptyCell[1]] = 7;
                     tempRed--;
                     food_remain--;
-                    console.log(tempRed);
                     continue;
                 }
                 else if(tempRed ==0 && tempGreen!=0){
                     board[emptyCell[0]][emptyCell[1]] = 8;
-                    console.log(tempGreen);
-                    console.log("Green Here")
                     tempGreen--;
                     food_remain--;
-                    console.log("Food remain is:" + food_remain)
                     continue;
                 }
                 else if(tempRed ==0 && tempGreen==0 && tempDragon!=0){
                     board[emptyCell[0]][emptyCell[1]] = 9;
-                    console.log(tempDragon)
-                    console.log("Dragon")
                     tempDragon--;
                     food_remain--;
                     continue;
@@ -243,6 +244,7 @@
             	canvas.width=canvas.width; //clean board
                 lblScore.value = score;
                 lblTime.value = time_elapsed;
+                LivesLeft.value = lives;
 
                 context.fillStyle = "black";
                 context.fillRect(0, 0, canvas.width, canvas.height);
@@ -456,6 +458,8 @@
                     if(lives==0){
                         window.clearInterval(interval);
                         window.alert("Game lost");
+                        m_game_over = true;
+                        playMusic();
                     }
                 }
 
@@ -467,6 +471,8 @@
             	{
             		window.clearInterval(interval);
             		window.alert("Game completed");
+                    m_game_won = true;
+                    playMusic();
             	}
             	else
             	{
@@ -476,7 +482,27 @@
             // document.addEventListener('DOMContentLoaded', (event) => {
             //     Start();
             // });
+            function playMusic() {
+            if(m_game_over == false && m_game_won ==false){
+                var dbgt_audio = document.getElementById("DBGT");
+                dbgt_audio.play();
+            }
+            if(m_game_over == true){
+                dbgt_audio.pause();
+                var GameOverAudio = document.getElementById("GameOver");
+                GameOverAudio.play();
+            }
+            if(m_game_won == true){
+                dbgt_audio.pause();
+                var GameWonAudio = document.getElementById("GameWon");
+                GameWonAudio.play();
+            }
+
+                }
         </script>
+
+        
+    
     </body>
     
 </html>
