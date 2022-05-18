@@ -2,7 +2,10 @@
 <html>
     <head></head>
     
-    <body>SCORE:
+    <body>
+        Player:
+        <input id="PlayerNameLabel" type="text" />
+        SCORE:
         <input id="lblScore" type="text" />
         TIME:
         <input id="lblTime" type="text" />
@@ -22,7 +25,14 @@
             var m_TotalBalls;
             var m_MaxTime;
             var m_PacDirection = 4;
-            var shape=new Object();
+
+            //The direction of the ghost path
+            var GhostOneDirection = "DOWN";
+            var GhostTwoDirection="RIGHT";
+            var GhostThreeDirection;
+            var GhostFourDirection;
+
+            var m_PacmanPosition=new Object();
             var FirstGhostPosition=new Object(); //Position of First Ghost
             var SecondGhostPosition=new Object(); //Position of Second Ghost
             var ThirdGhostPosition=new Object(); //Position of Third Ghost
@@ -31,10 +41,12 @@
             
             var special_pos=new Object();
             var m_special;
-            var m_prev;
-            var m1_prev;//if borad[][]==1 before
-            var m2_prev;
-            var m3_prev;
+            //if there was food before the ghosts stepped in the tile
+            var m_GhostOnePrev; 
+            var m_GhostTwoPrev;
+            var m_GhostThreePrev;
+            var m_GhostFourPrev;
+
 
             var m_livesUser;
             var m_TimesCatched; 
@@ -44,6 +56,7 @@
             var m_StartTime;
             var time_elapsed;    
             var interval;
+            var m_PlayerName = "Shachar"
 
             //scores for each ball
             var m_FirstBallScore = 5; 
@@ -111,6 +124,7 @@
             [4, 6, 0, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 5, 4],
             [4, 4, 4, 4, 4, 4, 4, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4]
             ]
+
                         
             //Ghosts start in corners
             FirstGhostPosition.i=1;
@@ -163,8 +177,8 @@
                             }
                         } 
                         else if (randomNum < 1.0 * (pacman_remain + food_remain) / cnt) { //place pacman
-                            shape.i=i;
-                            shape.j=j;
+                            m_PacmanPosition.i=i;
+                            m_PacmanPosition.j=j;
                             pacman_remain--;
                             board[i][j] = 2;
                         } 
@@ -253,6 +267,7 @@
                 lblScore.value = m_GameScore;
                 lblTime.value = time_elapsed;
                 LivesLeft.value = m_livesUser;
+                PlayerNameLabel.value = m_PlayerName;
 
                 context.fillStyle = "black";
                 context.fillRect(0, 0, canvas.width, canvas.height);
@@ -360,7 +375,6 @@
                         }
                         //draw Ghost4
                         else if (board[i][j] == 10) {
-                        console.log("I am Here")
                         base_image = new Image();
                         base_image.src = 'ghost4.png';
                         context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
@@ -390,85 +404,92 @@
                     ThirdGhostMovement();
                     FourthGhostMovement();
                 }
-                if(m_prev==2){
-                    m_prev=0;
-                }
+
             }
 
             /* Update the position of pacman according
             to what key has been pressed
             */
             function UpdatePosition() {
-            	board[shape.i][shape.j]=0;
+            	board[m_PacmanPosition.i][m_PacmanPosition.j]=0;
                 var x = GetKeyPressed()
                 //Move Pacman Up
                 if(x==1)
                 {
-                	if(shape.j>0 && board[shape.i][shape.j-1]!=4)
+                	if(m_PacmanPosition.j>0 && board[m_PacmanPosition.i][m_PacmanPosition.j-1]!=4)
                 	{
-                		shape.j--;
+                		m_PacmanPosition.j--;
                         m_PacDirection = 1;
                 	}
                 }
                 //Move Pacman Down
                 if(x==2)
                 {
-                	if(shape.j<17 && board[shape.i][shape.j+1]!=4)
+                	if(m_PacmanPosition.j<17 && board[m_PacmanPosition.i][m_PacmanPosition.j+1]!=4)
                 	{
-                		shape.j++;
+                		m_PacmanPosition.j++;
                         m_PacDirection = 2;
                 	}
                 }
-                //Move Pacman To The Right
+                //Move Pacman To The Left
                 if(x==3)
                 {
-                	if(shape.i>0 && board[shape.i-1][shape.j]!=4)
+                	if(m_PacmanPosition.i>0 && board[m_PacmanPosition.i-1][m_PacmanPosition.j]!=4)
                 	{
-                		shape.i--;
+                		m_PacmanPosition.i--;
                         m_PacDirection = 3;
                 	}
                 }
-                //Move Pacman To The Left
+                //Move Pacman To The Right
                 if(x==4)
                 {
-                	if(shape.i<17 && board[shape.i+1][shape.j]!=4)
+                	if(m_PacmanPosition.i<17 && board[m_PacmanPosition.i+1][m_PacmanPosition.j]!=4)
                 	{
-                		shape.i++;
+                		m_PacmanPosition.i++;
                         m_PacDirection = 4;
                 	}
                 }
                 //Pacman moves to a place where there is food
-                if(board[shape.i][shape.j]==7)
+                if(board[m_PacmanPosition.i][m_PacmanPosition.j]==7)
                 {
                 	m_GameScore = m_GameScore + m_FirstBallScore;
                 }
-                if(board[shape.i][shape.j]==8)
+                if(board[m_PacmanPosition.i][m_PacmanPosition.j]==8)
                 {
                 	m_GameScore = m_GameScore + m_SecondBallScore;
                 }
-                if(board[shape.i][shape.j]==9)
+                if(board[m_PacmanPosition.i][m_PacmanPosition.j]==9)
                 {
                 	m_GameScore = m_GameScore + m_ThirdBallScore;
                 }
-                board[shape.i][shape.j]=2; //Draw pacman in his new position
+                board[m_PacmanPosition.i][m_PacmanPosition.j]=2; //Draw pacman in his new position
                 var currentTime=new Date();
                 time_elapsed=(currentTime-m_StartTime)/1000;
 
                 /*
                 In case of a ghost catching pacman
                 */
-                if((shape.i==FirstGhostPosition.i && shape.j==FirstGhostPosition.j) || (shape.i==SecondGhostPosition.i && shape.j==SecondGhostPosition.j) || ((shape.i==ThirdGhostPosition.i && shape.j==ThirdGhostPosition.j))){
-                    board[shape.i][shape.j] = 0;
+                if((m_PacmanPosition.i==FirstGhostPosition.i && m_PacmanPosition.j==FirstGhostPosition.j) || (m_PacmanPosition.i==SecondGhostPosition.i && m_PacmanPosition.j==SecondGhostPosition.j) || ((m_PacmanPosition.i==ThirdGhostPosition.i && m_PacmanPosition.j==ThirdGhostPosition.j))){
+                    board[m_PacmanPosition.i][m_PacmanPosition.j] = 0;
                     board[FirstGhostPosition.i][FirstGhostPosition.j] = 0;
                     m_GameScore-=10;
                     m_TimesCatched++;
                     m_livesUser--;
                     FirstGhostPosition.i=1;
                     FirstGhostPosition.j=1;
+                    SecondGhostPosition.i=16;
+                    SecondGhostPosition.j=16;
+                    ThirdGhostPosition.i=16;
+                    ThirdGhostPosition.j=1;
+                    FourthGhostPosition.i=1;
+                    FourthGhostPosition.j=16;
                     board[FirstGhostPosition.i][FirstGhostPosition.j] = 3;
+                    board[SecondGhostPosition.i][SecondGhostPosition.j] = 5;
+                    board[ThirdGhostPosition.i][ThirdGhostPosition.j] = 6;
+                    board[FourthGhostPosition.i][FourthGhostPosition.j] = 10;
                     var emptyCell = findRandomEmptyCell(board);
-                    shape.i=emptyCell[0];
-                    shape.j=emptyCell[1];
+                    m_PacmanPosition.i=emptyCell[0];
+                    m_PacmanPosition.j=emptyCell[1];
                     if(m_livesUser==0){
                         window.clearInterval(interval);
                         window.alert("Game lost");
@@ -515,30 +536,111 @@
                 }
 
             function FirstGhostMovement(){
-                if(FirstGhostPosition.i < shape.i && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=4 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=5 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=6 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=10) {
-                        board[FirstGhostPosition.i][FirstGhostPosition.j] = m_prev;
-                        m_prev = board[FirstGhostPosition.i+1][FirstGhostPosition.j];
-                        FirstGhostPosition.i++;
-                        board[FirstGhostPosition.i][FirstGhostPosition.j]=3;
+                UpDistGhost1 = pythagorean(m_PacmanPosition.i - FirstGhostPosition.i, m_PacmanPosition.j - (FirstGhostPosition.j-1));
+                DownDistGhost1 = pythagorean(m_PacmanPosition.i - FirstGhostPosition.i, m_PacmanPosition.j - (FirstGhostPosition.j+1));
+                LeftDistGhost1 = pythagorean(m_PacmanPosition.i - (FirstGhostPosition.i-1), m_PacmanPosition.j - FirstGhostPosition.j);
+                RightDistGhost1 = pythagorean(m_PacmanPosition.i - (FirstGhostPosition.i+1), m_PacmanPosition.j - FirstGhostPosition.j);
+                //check for collision before moving
+                //and update dist to infinity so it will not choose it in case there is collision
+                if(board[FirstGhostPosition.i][FirstGhostPosition.j-1] == 4 || board[FirstGhostPosition.i][FirstGhostPosition.j-1] == 3 || board[FirstGhostPosition.i][FirstGhostPosition.j-1] == 5 || board[FirstGhostPosition.i][FirstGhostPosition.j-1] == 6 || board[FirstGhostPosition.i][FirstGhostPosition.j-1] == 10){
+                    UpDistGhost1 = Infinity;
                 }
-                else if(FirstGhostPosition.j < shape.j && board[FirstGhostPosition.i][FirstGhostPosition.j+1]!=4 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=5 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=6 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=10){
-                    board[FirstGhostPosition.i][FirstGhostPosition.j] = m_prev;
-                    m_prev = board[FirstGhostPosition.i][FirstGhostPosition.j+1];
+                if(board[FirstGhostPosition.i][FirstGhostPosition.j+1] == 4 || board[FirstGhostPosition.i][FirstGhostPosition.j+1] == 3 || board[FirstGhostPosition.i][FirstGhostPosition.j+1] == 5 || board[FirstGhostPosition.i][FirstGhostPosition.j+1] == 6 || board[FirstGhostPosition.i][FirstGhostPosition.j+1] == 10){
+                    DownDistGhost1 = Infinity;
+                }
+                if(board[FirstGhostPosition.i-1][FirstGhostPosition.j] == 4 || board[FirstGhostPosition.i-1][FirstGhostPosition.j] == 3 || board[FirstGhostPosition.i-1][FirstGhostPosition.j] == 5 || board[FirstGhostPosition.i-1][FirstGhostPosition.j] == 6 || board[FirstGhostPosition.i-1][FirstGhostPosition.j] == 10){
+                    LeftDistGhost1 = Infinity;
+                }
+                if(board[FirstGhostPosition.i+1][FirstGhostPosition.j] == 4 || board[FirstGhostPosition.i+1][FirstGhostPosition.j] == 3 || board[FirstGhostPosition.i+1][FirstGhostPosition.j] == 5 || board[FirstGhostPosition.i+1][FirstGhostPosition.j] == 6 || board[FirstGhostPosition.i+1][FirstGhostPosition.j] == 10){
+                    RightDistGhost1 = Infinity;
+                }
+                PrefferdDirection1 = GetPrefDir(UpDistGhost1, DownDistGhost1, LeftDistGhost1, RightDistGhost1, GhostOneDirection);
+
+                if(PrefferdDirection1.localeCompare("UP") == 0){
+                    board[FirstGhostPosition.i][FirstGhostPosition.j] = m_GhostOnePrev;
+                    m_GhostOnePrev = board[FirstGhostPosition.i][FirstGhostPosition.j-1];
+                    FirstGhostPosition.j--;
+                    board[FirstGhostPosition.i][FirstGhostPosition.j]=3;
+                    GhostOneDirection = "UP";
+                }
+                if(PrefferdDirection1.localeCompare("DOWN") == 0){
+                    board[FirstGhostPosition.i][FirstGhostPosition.j] = m_GhostOnePrev;
+                    m_GhostOnePrev = board[FirstGhostPosition.i][FirstGhostPosition.j+1];
                     FirstGhostPosition.j++;
                     board[FirstGhostPosition.i][FirstGhostPosition.j]=3;
+                    GhostOneDirection = "DOWN";
                 }
-                else if(FirstGhostPosition.i > shape.i){
-                    if(board[FirstGhostPosition.i-1][FirstGhostPosition.j]!=4 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=5 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=6 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=10){
-                        board[FirstGhostPosition.i][FirstGhostPosition.j] = m_prev;
-                        m_prev = board[FirstGhostPosition.i-1][FirstGhostPosition.j];
-                        FirstGhostPosition.i--;
-                        board[FirstGhostPosition.i][FirstGhostPosition.j]=3;
-                    }
+                if(PrefferdDirection1.localeCompare("LEFT") == 0){
+                    board[FirstGhostPosition.i][FirstGhostPosition.j] = m_GhostOnePrev; //place the food back if there was one
+                    m_GhostOnePrev = board[FirstGhostPosition.i-1][FirstGhostPosition.j]; //keep whats in the tile before moving for later
+                    FirstGhostPosition.i--; //move LEFT
+                    board[FirstGhostPosition.i][FirstGhostPosition.j]=3; //Update
+                    GhostOneDirection = "LEFT";
+                }
+                if(PrefferdDirection1.localeCompare("RIGHT") == 0){
+                    board[FirstGhostPosition.i][FirstGhostPosition.j] = m_GhostOnePrev;
+                    m_GhostOnePrev = board[FirstGhostPosition.i+1][FirstGhostPosition.j];
+                    FirstGhostPosition.i++;
+                    board[FirstGhostPosition.i][FirstGhostPosition.j]=3;
+                    GhostOneDirection = "RIGHT";
+                }
+                if(m_GhostOnePrev==2){
+                    m_GhostOnePrev=0;
                 }
             }
 
             function SecondGhostMovement(){
-                return 1;
+                UpDistGhost2 = pythagorean(m_PacmanPosition.i - SecondGhostPosition.i, m_PacmanPosition.j - (SecondGhostPosition.j-1));
+                DownDistGhost2 = pythagorean(m_PacmanPosition.i - SecondGhostPosition.i, m_PacmanPosition.j - (SecondGhostPosition.j+1));
+                LeftDistGhost2 = pythagorean(m_PacmanPosition.i - (SecondGhostPosition.i-1), m_PacmanPosition.j - SecondGhostPosition.j);
+                RightDistGhost2 = pythagorean(m_PacmanPosition.i - (SecondGhostPosition.i+1), m_PacmanPosition.j - SecondGhostPosition.j);
+                //check for collision before moving
+                //and update dist to infinity so it will not choose it in case there is collision
+                if(board[SecondGhostPosition.i][SecondGhostPosition.j-1] == 4 || board[SecondGhostPosition.i][SecondGhostPosition.j-1] == 3 || board[SecondGhostPosition.i][SecondGhostPosition.j-1] == 5 || board[SecondGhostPosition.i][SecondGhostPosition.j-1] == 6 || board[SecondGhostPosition.i][SecondGhostPosition.j-1] == 10){
+                    UpDistGhost2 = Infinity;
+                }
+                if(board[SecondGhostPosition.i][SecondGhostPosition.j+1] == 4 || board[SecondGhostPosition.i][SecondGhostPosition.j+1] == 3 || board[SecondGhostPosition.i][SecondGhostPosition.j+1] == 5 || board[SecondGhostPosition.i][SecondGhostPosition.j+1] == 6 || board[SecondGhostPosition.i][SecondGhostPosition.j+1] == 10){
+                    DownDistGhost2 = Infinity;
+                }
+                if(board[SecondGhostPosition.i-1][SecondGhostPosition.j] == 4 || board[SecondGhostPosition.i-1][SecondGhostPosition.j] == 3 || board[SecondGhostPosition.i-1][SecondGhostPosition.j] == 5 || board[SecondGhostPosition.i-1][SecondGhostPosition.j] == 6 || board[SecondGhostPosition.i-1][SecondGhostPosition.j] == 10){
+                    LeftDistGhost2 = Infinity;
+                }
+                if(board[SecondGhostPosition.i+1][SecondGhostPosition.j] == 4 || board[SecondGhostPosition.i+1][SecondGhostPosition.j] == 3 || board[SecondGhostPosition.i+1][SecondGhostPosition.j] == 5 || board[SecondGhostPosition.i+1][SecondGhostPosition.j] == 6 || board[SecondGhostPosition.i+1][SecondGhostPosition.j] == 10){
+                    RightDistGhost2 = Infinity;
+                }
+                PrefferdDirection2 = GetPrefDir(UpDistGhost2, DownDistGhost2, LeftDistGhost2, RightDistGhost2, GhostTwoDirection);
+
+                if(PrefferdDirection2.localeCompare("UP") == 0){
+                    board[SecondGhostPosition.i][SecondGhostPosition.j] = m_GhostTwoPrev;
+                    m_GhostTwoPrev = board[SecondGhostPosition.i][SecondGhostPosition.j-1];
+                    SecondGhostPosition.j--;
+                    board[SecondGhostPosition.i][SecondGhostPosition.j]=5;
+                    GhostTwoDirection = "UP";
+                }
+                if(PrefferdDirection2.localeCompare("DOWN") == 0){
+                    board[SecondGhostPosition.i][SecondGhostPosition.j] = m_GhostTwoPrev;
+                    m_GhostTwoPrev = board[SecondGhostPosition.i][SecondGhostPosition.j+1];
+                    SecondGhostPosition.j++;
+                    board[SecondGhostPosition.i][SecondGhostPosition.j]=5;
+                    GhostTwoDirection = "DOWN";
+                }
+                if(PrefferdDirection2.localeCompare("LEFT") == 0){
+                    board[SecondGhostPosition.i][SecondGhostPosition.j] = m_GhostTwoPrev; //place the food back if there was one
+                    m_GhostTwoPrev = board[SecondGhostPosition.i-1][SecondGhostPosition.j]; //keep whats in the tile before moving for later
+                    SecondGhostPosition.i--; //move LEFT
+                    board[SecondGhostPosition.i][SecondGhostPosition.j]=5; //Update
+                    GhostTwoDirection = "LEFT";
+                }
+                if(PrefferdDirection2.localeCompare("RIGHT") == 0){
+                    board[SecondGhostPosition.i][SecondGhostPosition.j] = m_GhostTwoPrev;
+                    m_GhostTwoPrev = board[SecondGhostPosition.i+1][SecondGhostPosition.j];
+                    SecondGhostPosition.i++;
+                    board[SecondGhostPosition.i][SecondGhostPosition.j]=5;
+                    GhostTwoDirection = "RIGHT";
+                }
+                if(m_GhostTwoPrev==2){
+                    m_GhostTwoPrev=0;
+                }
             }
 
             function ThirdGhostMovement(){
@@ -549,64 +651,50 @@
                 return 1;
             }
 
-            /**
-             *     public boolean legalMove(String direction)
-    {
-        int thisRow = playerRow;
-        int thisCol = playerCol;
+            function pythagorean(sideA, sideB){
+                return Math.sqrt(Math.pow(sideA, 2) + Math.pow(sideB, 2));
+            }
 
-        if(direction.equals("up"))
-        {
-            if((thisRow - 1 < 0) || (maze.getMazeArr()[thisRow - 1][thisCol] == 1))
-                return false;
-        }
-        else if (direction.equals("up right"))
-        {
-            if((thisRow - 1 < 0) || (thisCol + 1 >= maze.getMax_columns()) || (maze.getMazeArr()[thisRow - 1][thisCol + 1] == 1))
-                return false;
-            if((maze.getMazeArr()[thisRow - 1][thisCol] == 1) && (maze.getMazeArr()[thisRow][thisCol + 1] == 1))
-                return false;
-        }
-        else if (direction.equals("right"))
-        {
-            if((thisCol + 1 >= maze.getMax_columns()) || (maze.getMazeArr()[thisRow][thisCol + 1] == 1))
-                return false;
-        }
-        else if (direction.equals("down right"))
-        {
-            if((thisRow + 1 >= maze.getMax_rows()) || (thisCol + 1 >= maze.getMax_columns()) || (maze.getMazeArr()[thisRow + 1][thisCol + 1] == 1))
-                return false;
-            if((maze.getMazeArr()[thisRow + 1][thisCol] == 1) && (maze.getMazeArr()[thisRow][thisCol + 1] == 1))
-                return false;
-        }
-        else if (direction.equals("down"))
-        {
-            if((thisRow + 1 >= maze.getMax_rows()) || (maze.getMazeArr()[thisRow + 1][thisCol] == 1))
-                return false;
-        }
-        else if (direction.equals("down left"))
-        {
-            if((thisRow + 1 >= maze.getMax_rows()) || (thisCol - 1 < 0) || (maze.getMazeArr()[thisRow + 1][thisCol - 1] == 1))
-                return false;
-            if((maze.getMazeArr()[thisRow + 1][thisCol] == 1) && (maze.getMazeArr()[thisRow][thisCol - 1] == 1))
-                return false;
-        }
-        else if (direction.equals("left"))
-        {
-            if((thisCol - 1 < 0) || (maze.getMazeArr()[thisRow][thisCol - 1] == 1))
-                return false;
-        }
-        else if (direction.equals("up left"))
-        {
-            if((thisRow - 1 < 0) || (thisCol - 1 < 0) || (maze.getMazeArr()[thisRow - 1][thisCol - 1] == 1))
-                return false;
-            if((maze.getMazeArr()[thisRow - 1][thisCol] == 1) && (maze.getMazeArr()[thisRow][thisCol - 1] == 1))
-                return false;
-        }
+            //Get the Preffered direction for the ghost to go to
+            function GetPrefDir(UpDist, DownDist, LeftDist, RightDist, GhostPrevDir){
+                num_of_mins = 0;
+                if(Math.min(UpDist, DownDist, LeftDist, RightDist) == UpDist){
+                    num_of_mins++;
+                    if(GhostPrevDir.localeCompare("DOWN") != 0){
+                        return "UP"
+                    }
+                }
+                if(Math.min(DownDist, LeftDist, RightDist) == DownDist){
+                    if(GhostPrevDir.localeCompare("UP") != 0){
+                        return "DOWN"
+                    }
+                }
+                if(Math.min(LeftDist, RightDist) == LeftDist){
+                    if(GhostPrevDir.localeCompare("RIGHT") != 0){
+                        return "LEFT"
+                    }
+                }
+                if(Math.min(RightDist) ==RightDist){
+                    if(GhostPrevDir.localeCompare("LEFT") != 0){
+                        return "RIGHT"
+                    }
+                }
+                //In case of there is no best move just keep going in the same direction
+                if(GhostPrevDir.localeCompare("UP") == 0){
+                    return "UP"
+                }
+                if(GhostPrevDir.localeCompare("DOWN") == 0){
+                    return "DOWN"
+                }
+                if(GhostPrevDir.localeCompare("LEFT") == 0){
+                    return "LEFT"
+                }
+                if(GhostPrevDir.localeCompare("RIGHT") == 0){
+                    return "RIGHT"
+                }
+            }
 
-        return true;
-    }
-            */
+
         </script>
 
         
