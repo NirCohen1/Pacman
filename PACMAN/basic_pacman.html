@@ -7,10 +7,12 @@
         <input id="PlayerNameLabel" type="text" />
         SCORE:
         <input id="lblScore" type="text" />
-        TIME:
+        TIME Left:
         <input id="lblTime" type="text" />
         Lives Left:
         <input id="LivesLeft" type="text" />
+        Target Score:
+        <input id="TargetScore" type="text" />
         <br/>
         <canvas id="canvas" style="border: 5px solid black;" height="740" width="740"></canvas>
         <audio id="DBGT" src="DAN DAN DBGT.mp3"></audio>
@@ -20,17 +22,18 @@
         <script type="text/javascript">
 
             var context = canvas.getContext("2d");
+            var m_TargetScore = 0;
             //random
             var m_GhostNum = 3;
             var m_TotalBalls;
-            var m_MaxTime;
+            var m_MaxTime = 180;
             var m_PacDirection = 4;
 
             //The direction of the ghost path
             var GhostOneDirection = "DOWN";
             var GhostTwoDirection="RIGHT";
-            var GhostThreeDirection;
-            var GhostFourDirection;
+            var GhostThreeDirection="RIGHT";
+            var GhostFourDirection="DOWN";
 
             var m_PacmanPosition=new Object();
             var FirstGhostPosition=new Object(); //Position of First Ghost
@@ -94,7 +97,7 @@
             m_TimesCatched = 0
             m_PacColor="yellow";
             var cnt = 288;
-            var food_remain = 90;
+            var food_remain = 20;
             var pacman_remain = 1;
             m_livesUser = 5;
             m_StartTime= new Date();
@@ -164,16 +167,19 @@
                                 board[i][j] = 7;
                                 tempRed--;
                                 food_remain--;
+                                m_TargetScore += m_FirstBallScore;
                             }
                             else if(tempRed == 0 && tempGreen!=0){
                                 board[i][j] = 8;
                                 tempGreen--;
                                 food_remain--;
+                                m_TargetScore += m_SecondBallScore;
                             }
                             else if(tempRed == 0 && tempGreen==0 && tempDragon!=0){
                                 board[i][j] = 9;
                                 tempDragon--;
                                 food_remain--;
+                                m_TargetScore += m_ThirdBallScore;
                             }
                         } 
                         else if (randomNum < 1.0 * (pacman_remain + food_remain) / cnt) { //place pacman
@@ -196,18 +202,21 @@
                     board[emptyCell[0]][emptyCell[1]] = 7;
                     tempRed--;
                     food_remain--;
+                    m_TargetScore += m_FirstBallScore;
                     continue;
                 }
                 else if(tempRed ==0 && tempGreen!=0){
                     board[emptyCell[0]][emptyCell[1]] = 8;
                     tempGreen--;
                     food_remain--;
+                    m_TargetScore += m_SecondBallScore;
                     continue;
                 }
                 else if(tempRed ==0 && tempGreen==0 && tempDragon!=0){
                     board[emptyCell[0]][emptyCell[1]] = 9;
                     tempDragon--;
                     food_remain--;
+                    m_TargetScore += m_ThirdBallScore;
                     continue;
                 }
             }
@@ -265,9 +274,10 @@
             function Draw() {
             	canvas.width=canvas.width; //clean board
                 lblScore.value = m_GameScore;
-                lblTime.value = time_elapsed;
+                lblTime.value = m_MaxTime - time_elapsed;
                 LivesLeft.value = m_livesUser;
                 PlayerNameLabel.value = m_PlayerName;
+                TargetScore.value = m_TargetScore;
 
                 context.fillStyle = "black";
                 context.fillRect(0, 0, canvas.width, canvas.height);
@@ -466,6 +476,15 @@
                 var currentTime=new Date();
                 time_elapsed=(currentTime-m_StartTime)/1000;
 
+                if(m_GameScore==m_TargetScore)
+            	{
+            		window.clearInterval(interval);
+            		window.alert("Winner!!!");
+                    m_GameWon = true;
+                    m_TargetScore = 0;
+                    playMusic();
+            	}
+
                 /*
                 In case of a ghost catching pacman
                 */
@@ -495,23 +514,12 @@
                     m_PacmanPosition.j=emptyCell[1];
                     if(m_livesUser==0){
                         window.clearInterval(interval);
-                        window.alert("Game lost");
+                        window.alert("Loser!!!");
                         m_GameOver = true;
                         playMusic();
                     }
                 }
 
-            	if(m_GameScore>=20&&time_elapsed<=10)
-            	{
-            		m_PacColor="green";
-            	}
-            	if(m_GameScore==(150-10*m_TimesCatched))
-            	{
-            		window.clearInterval(interval);
-            		window.alert("Game completed");
-                    m_GameWon = true;
-                    playMusic();
-            	}
             	else
             	{
             		Draw();
@@ -647,7 +655,57 @@
             }
 
             function ThirdGhostMovement(){
-                return 1;
+                UpDistGhost3 = pythagorean(m_PacmanPosition.i - ThirdGhostPosition.i, m_PacmanPosition.j - (ThirdGhostPosition.j-1));
+                DownDistGhost3 = pythagorean(m_PacmanPosition.i - ThirdGhostPosition.i, m_PacmanPosition.j - (ThirdGhostPosition.j+1));
+                LeftDistGhost3 = pythagorean(m_PacmanPosition.i - (ThirdGhostPosition.i-1), m_PacmanPosition.j - ThirdGhostPosition.j);
+                RightDistGhost3 = pythagorean(m_PacmanPosition.i - (ThirdGhostPosition.i+1), m_PacmanPosition.j - ThirdGhostPosition.j);
+                //check for collision before moving
+                //and update dist to infinity so it will not choose it in case there is collision
+                if(board[ThirdGhostPosition.i][ThirdGhostPosition.j-1] == 4 || board[ThirdGhostPosition.i][ThirdGhostPosition.j-1] == 3 || board[ThirdGhostPosition.i][ThirdGhostPosition.j-1] == 5 || board[ThirdGhostPosition.i][ThirdGhostPosition.j-1] == 6 || board[ThirdGhostPosition.i][ThirdGhostPosition.j-1] == 10){
+                    UpDistGhost3 = Infinity;
+                }
+                if(board[ThirdGhostPosition.i][ThirdGhostPosition.j+1] == 4 || board[ThirdGhostPosition.i][ThirdGhostPosition.j+1] == 3 || board[ThirdGhostPosition.i][ThirdGhostPosition.j+1] == 5 || board[ThirdGhostPosition.i][ThirdGhostPosition.j+1] == 6 || board[ThirdGhostPosition.i][ThirdGhostPosition.j+1] == 10){
+                    DownDistGhost3 = Infinity;
+                }
+                if(board[ThirdGhostPosition.i-1][ThirdGhostPosition.j] == 4 || board[ThirdGhostPosition.i-1][ThirdGhostPosition.j] == 3 || board[ThirdGhostPosition.i-1][ThirdGhostPosition.j] == 5 || board[ThirdGhostPosition.i-1][ThirdGhostPosition.j] == 6 || board[ThirdGhostPosition.i-1][ThirdGhostPosition.j] == 10){
+                    LeftDistGhost3 = Infinity;
+                }
+                if(board[ThirdGhostPosition.i+1][ThirdGhostPosition.j] == 4 || board[ThirdGhostPosition.i+1][ThirdGhostPosition.j] == 3 || board[ThirdGhostPosition.i+1][ThirdGhostPosition.j] == 5 || board[ThirdGhostPosition.i+1][ThirdGhostPosition.j] == 6 || board[ThirdGhostPosition.i+1][ThirdGhostPosition.j] == 10){
+                    RightDistGhost3 = Infinity;
+                }
+                PrefferdDirection3 = GetPrefDir(UpDistGhost3, DownDistGhost3, LeftDistGhost3, RightDistGhost3, GhostThreeDirection);
+
+                if(PrefferdDirection3.localeCompare("UP") == 0){
+                    board[ThirdGhostPosition.i][ThirdGhostPosition.j] = m_GhostThreePrev;
+                    m_GhostThreePrev = board[ThirdGhostPosition.i][ThirdGhostPosition.j-1];
+                    ThirdGhostPosition.j--;
+                    board[ThirdGhostPosition.i][ThirdGhostPosition.j]=6;
+                    GhostThreeDirection = "UP";
+                }
+                if(PrefferdDirection3.localeCompare("DOWN") == 0){
+                    board[ThirdGhostPosition.i][ThirdGhostPosition.j] = m_GhostThreePrev;
+                    m_GhostThreePrev = board[ThirdGhostPosition.i][ThirdGhostPosition.j+1];
+                    ThirdGhostPosition.j++;
+                    board[ThirdGhostPosition.i][ThirdGhostPosition.j]=6;
+                    GhostThreeDirection = "DOWN";
+                }
+                if(PrefferdDirection3.localeCompare("LEFT") == 0){
+                    board[ThirdGhostPosition.i][ThirdGhostPosition.j] = m_GhostThreePrev; //place the food back if there was one
+                    m_GhostThreePrev = board[ThirdGhostPosition.i-1][ThirdGhostPosition.j]; //keep whats in the tile before moving for later
+                    ThirdGhostPosition.i--; //move LEFT
+                    board[ThirdGhostPosition.i][ThirdGhostPosition.j]=6; //Update
+                    GhostThreeDirection = "LEFT";
+                }
+                if(PrefferdDirection3.localeCompare("RIGHT") == 0){
+                    board[ThirdGhostPosition.i][ThirdGhostPosition.j] = m_GhostThreePrev;
+                    m_GhostThreePrev = board[ThirdGhostPosition.i+1][ThirdGhostPosition.j];
+                    ThirdGhostPosition.i++;
+                    board[ThirdGhostPosition.i][ThirdGhostPosition.j]=6;
+                    GhostThreeDirection = "RIGHT";
+                }
+                if(m_GhostThreePrev==2){
+                    m_GhostThreePrev=0;
+                }
             }
 
             function FourthGhostMovement(){
