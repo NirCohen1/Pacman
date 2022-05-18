@@ -469,9 +469,12 @@
                 /*
                 In case of a ghost catching pacman
                 */
-                if((m_PacmanPosition.i==FirstGhostPosition.i && m_PacmanPosition.j==FirstGhostPosition.j) || (m_PacmanPosition.i==SecondGhostPosition.i && m_PacmanPosition.j==SecondGhostPosition.j) || ((m_PacmanPosition.i==ThirdGhostPosition.i && m_PacmanPosition.j==ThirdGhostPosition.j))){
+                if((m_PacmanPosition.i==FirstGhostPosition.i && m_PacmanPosition.j==FirstGhostPosition.j) || (m_PacmanPosition.i==SecondGhostPosition.i && m_PacmanPosition.j==SecondGhostPosition.j) || ((m_PacmanPosition.i==ThirdGhostPosition.i && m_PacmanPosition.j==ThirdGhostPosition.j) || ((m_PacmanPosition.i==FourthGhostPosition.i && m_PacmanPosition.j==FourthGhostPosition.j)))){
                     board[m_PacmanPosition.i][m_PacmanPosition.j] = 0;
                     board[FirstGhostPosition.i][FirstGhostPosition.j] = 0;
+                    board[SecondGhostPosition.i][SecondGhostPosition.j] = 0;
+                    board[ThirdGhostPosition.i][ThirdGhostPosition.j] = 0;
+                    board[FourthGhostPosition.i][FourthGhostPosition.j] = 0;
                     m_GameScore-=10;
                     m_TimesCatched++;
                     m_livesUser--;
@@ -657,40 +660,67 @@
 
             //Get the Preffered direction for the ghost to go to
             function GetPrefDir(UpDist, DownDist, LeftDist, RightDist, GhostPrevDir){
-                num_of_mins = 0;
+                //CHECK UP
                 if(Math.min(UpDist, DownDist, LeftDist, RightDist) == UpDist){
-                    num_of_mins++;
                     if(GhostPrevDir.localeCompare("DOWN") != 0){
                         return "UP"
                     }
+                    if(Math.min(DownDist, LeftDist, RightDist) == DownDist){
+                        return "DOWN";
+                    }
+                    if(Math.min(DownDist, LeftDist, RightDist) == LeftDist){
+                        return "LEFT";
+                    }
+                    if(Math.min(DownDist, LeftDist, RightDist) == RightDist){
+                        return "RIGHT";
+                    }
                 }
-                if(Math.min(DownDist, LeftDist, RightDist) == DownDist){
+                //CHECK DOWN
+                if(Math.min(UpDist, DownDist, LeftDist, RightDist) == DownDist){
                     if(GhostPrevDir.localeCompare("UP") != 0){
                         return "DOWN"
                     }
+                    if(Math.min(UpDist, LeftDist, RightDist) == UpDist){
+                        return "UP";
+                    }
+                    if(Math.min(UpDist, LeftDist, RightDist) == LeftDist){
+                        return "LEFT";
+                    }
+                    if(Math.min(UpDist, LeftDist, RightDist) == RightDist){
+                        return "RIGHT";
+                    }
                 }
-                if(Math.min(LeftDist, RightDist) == LeftDist){
+
+                //CHECK LEFT
+                if(Math.min(UpDist, DownDist, LeftDist, RightDist) == LeftDist){
                     if(GhostPrevDir.localeCompare("RIGHT") != 0){
                         return "LEFT"
                     }
+                    if(Math.min(UpDist, DownDist, RightDist) == UpDist){
+                        return "UP";
+                    }
+                    if(Math.min(UpDist, DownDist, RightDist) == DownDist){
+                        return "DOWN";
+                    }
+                    if(Math.min(UpDist, DownDist, RightDist) == RightDist){
+                        return "RIGHT";
+                    }
                 }
-                if(Math.min(RightDist) ==RightDist){
+
+                //CHECK RIGHT
+                if(Math.min(UpDist, DownDist, LeftDist, RightDist) == RightDist){
                     if(GhostPrevDir.localeCompare("LEFT") != 0){
                         return "RIGHT"
                     }
-                }
-                //In case of there is no best move just keep going in the same direction
-                if(GhostPrevDir.localeCompare("UP") == 0){
-                    return "UP"
-                }
-                if(GhostPrevDir.localeCompare("DOWN") == 0){
-                    return "DOWN"
-                }
-                if(GhostPrevDir.localeCompare("LEFT") == 0){
-                    return "LEFT"
-                }
-                if(GhostPrevDir.localeCompare("RIGHT") == 0){
-                    return "RIGHT"
+                    if(Math.min(UpDist, DownDist, LeftDist) == UpDist){
+                        return "UP";
+                    }
+                    if(Math.min(UpDist, DownDist, LeftDist) == DownDist){
+                        return "DOWN";
+                    }
+                    if(Math.min(UpDist, DownDist, LeftDist) == LeftDist){
+                        return "LEFT";
+                    }
                 }
             }
 
