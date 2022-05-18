@@ -18,29 +18,30 @@
 
             var context = canvas.getContext("2d");
             //random
-            var ghost_num;
+            var m_GhostNum = 3;
             var m_TotalBalls;
-            var max_time;
-            var m_pac_direction = 4;
+            var m_MaxTime;
+            var m_PacDirection = 4;
             var shape=new Object();
-            var m1_pos=new Object(); //Position of First Ghost
-            var m2_pos=new Object(); //Position of Second Ghost
-            var m3_pos=new Object(); //Position of Third Ghost
+            var FirstGhostPosition=new Object(); //Position of First Ghost
+            var SecondGhostPosition=new Object(); //Position of Second Ghost
+            var ThirdGhostPosition=new Object(); //Position of Third Ghost
+            var FourthGhostPosition=new Object(); //Position of Fourth Ghost
             var bonus_pos=new Object(); 
             
             var special_pos=new Object();
-            var special;
-            var prev;
+            var m_special;
+            var m_prev;
             var m1_prev;//if borad[][]==1 before
             var m2_prev;
             var m3_prev;
 
-            var livesUser;
-            var catched; 
+            var m_livesUser;
+            var m_TimesCatched; 
             var board;
-            var score;
-            var pac_color;
-            var start_time;
+            var m_GameScore;
+            var m_PacColor;
+            var m_StartTime;
             var time_elapsed;    
             var interval;
 
@@ -50,14 +51,14 @@
             var m_ThirdBallScore = 25;
 
             //has the game been completed
-            var m_game_won = false;
-            var m_game_over = false;
+            var m_GameWon = false;
+            var m_GameOver = false;
 
             //Game Keys Values
-            var KeyUpUser = 38;
-            var KeyDownUser = 40
-            var KeyLeftUser = 37;
-            var KeyRightUser = 39;
+            var m_KeyUpUser = 38;
+            var m_KeyDownUser = 40
+            var m_KeyLeftUser = 37;
+            var m_KeyRightUser = 39;
 
 
             
@@ -76,15 +77,15 @@
                 Ghosts: 3
             */
             board = new Array();
-            score = 0;
-            catched = 0
-            pac_color="yellow";
+            m_GameScore = 0;
+            m_TimesCatched = 0
+            m_PacColor="yellow";
             var cnt = 288;
             var food_remain = 90;
             var pacman_remain = 1;
-            livesUser = 5;
-            start_time= new Date();
-            special=1;
+            m_livesUser = 5;
+            m_StartTime= new Date();
+            m_special=1;
             var m_FirstBallNum = Math.round(0.6*m_TotalBalls);
             var m_SecondBallNum= Math.round(0.3*m_TotalBalls);;
             var m_ThirdBallNum= Math.round(0.1*m_TotalBalls);;
@@ -92,7 +93,7 @@
 
             board = [
             [4, 4, 4, 4, 4 ,4 ,4 ,0 ,0, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-            [4, 3, 0, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+            [4, 3, 0, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 10, 4],
             [4, 0, 4, 4, 4 ,0 ,4 ,4 ,4, 0, 4, 4, 4, 0, 4, 4, 0, 4],
             [4, 0, 4, 0, 0 ,0 ,4 ,0 ,4, 0, 4, 0, 4, 0, 0, 0, 0, 4],
             [4, 0, 4, 0, 4 ,4 ,4 ,0 ,0, 0, 0, 0, 4, 4, 4, 0, 0, 4],
@@ -111,11 +112,18 @@
             [4, 4, 4, 4, 4, 4, 4, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4]
             ]
                         
-            //Ghosts start in corner
-            m1_pos.i=1;
-            m1_pos.j=1;
-            m2_pos.i=16;
-            m2_pos.j=16;
+            //Ghosts start in corners
+            FirstGhostPosition.i=1;
+            FirstGhostPosition.j=1;
+
+            SecondGhostPosition.i=16;
+            SecondGhostPosition.j=16;
+
+            ThirdGhostPosition.i=16;
+            ThirdGhostPosition.j=1;
+
+            FourthGhostPosition.i=1;
+            FourthGhostPosition.j=16;
             
             tempRed = Math.floor(0.6*food_remain);
             tempGreen = Math.floor(0.3*food_remain);
@@ -131,7 +139,7 @@
             */
             for (var i = 0; i < 18; i++) { //18 is the number of rows and columns
                 for (var j = 0; j < 18; j++) {
-                    if(board[i][j]==4 || board[i][j]==3 || board[i][j]==5 || board[i][j]==6){
+                    if(board[i][j]==4 || board[i][j]==3 || board[i][j]==5 || board[i][j]==6 || board[i][j]==10){
                         continue;
                     }
                     //place food and pacman
@@ -142,7 +150,6 @@
                                 board[i][j] = 7;
                                 tempRed--;
                                 food_remain--;
-                                console.log(tempRed);
                             }
                             else if(tempRed == 0 && tempGreen!=0){
                                 board[i][j] = 8;
@@ -205,7 +212,7 @@
             function findRandomEmptyCell(board){
              	var i = Math.floor((Math.random() * 9) + 1);
              	var j = Math.floor((Math.random() * 9) + 1);
-    			while(board[i][j]!=0 && board[i][j]!=7 && board[i][j]!=8 && board[i][j]!=9 && board[i][j]!=3 && board[i][j]!=4 && board[i][j]!=5 && board[i][j]!=4)
+    			while(board[i][j]!=0 && board[i][j]!=7 && board[i][j]!=8 && board[i][j]!=9 && board[i][j]!=3 && board[i][j]!=4 && board[i][j]!=5 && board[i][j]!=4 && board[i][j]!=10)
     			{
              		i = Math.floor((Math.random() * 9) + 1);
              		j = Math.floor((Math.random() * 9) + 1);
@@ -216,36 +223,36 @@
             //Receive as input the key on which the user clicks and return value accordingly
             function GetKeyPressed() {
                 //ArrowUp
-                if (keysDown[KeyUpUser]) {
+                if (keysDown[m_KeyUpUser]) {
                     return 1;
                 }
                 //ArrowDown
-                if (keysDown[KeyDownUser]) { 
+                if (keysDown[m_KeyDownUser]) { 
                     return 2;
                 }
                 //ArrowLeft
-                if (keysDown[KeyLeftUser]) { 
+                if (keysDown[m_KeyLeftUser]) { 
                     return 3;
                 }
                 //ArrowRight
-                if (keysDown[KeyRightUser]) { 
+                if (keysDown[m_KeyRightUser]) { 
                     return 4;
                 }
             }
 
             //Allow the user to enter random game values
             function Randomize() {
-                ghost_num = Math.floor(Math.random() * 4);
+                m_GhostNum = Math.floor(Math.random() * 4);
                 m_TotalBalls = Math.floor(Math.random() * 51) + 40;
-                max_time = 60 + Math.floor(Math.random() * 150);
+                m_MaxTime = 60 + Math.floor(Math.random() * 150);
             }
 
 
             function Draw() {
             	canvas.width=canvas.width; //clean board
-                lblScore.value = score;
+                lblScore.value = m_GameScore;
                 lblTime.value = time_elapsed;
-                LivesLeft.value = livesUser;
+                LivesLeft.value = m_livesUser;
 
                 context.fillStyle = "black";
                 context.fillRect(0, 0, canvas.width, canvas.height);
@@ -259,11 +266,11 @@
                         //draw pacman
                         if (board[i][j] == 2) {
                         //UP
-                            if(m_pac_direction == 1){
+                            if(m_PacDirection == 1){
                                 context.beginPath();
                                 context.arc(center.x, center.y, 20, 1.85 * Math.PI, 1.45 * Math.PI); // half circle
                                 context.lineTo(center.x, center.y);
-                                context.fillStyle = pac_color; //color 
+                                context.fillStyle = m_PacColor; //color 
                                 context.fill();
                                 context.beginPath();
                                 context.arc(center.x - 5, center.y + 13, 4, 0, 2 * Math.PI); // circle
@@ -271,11 +278,11 @@
                                 context.fill();
                             }
                             //Down
-                            if(m_pac_direction == 2){
+                            if(m_PacDirection == 2){
                                 context.beginPath();
                                 context.arc(center.x, center.y, 20, 0.6 * Math.PI, 0.3 * Math.PI); // half circle
                                 context.lineTo(center.x, center.y);
-                                context.fillStyle = pac_color; //color 
+                                context.fillStyle = m_PacColor; //color 
                                 context.fill();
                                 context.beginPath();
                                 context.arc(center.x + 5, center.y - 13, 4, 0, 2 * Math.PI); // circle
@@ -283,11 +290,11 @@
                                 context.fill();
                             }
                             //Left
-                            if(m_pac_direction == 3){
+                            if(m_PacDirection == 3){
                                 context.beginPath();
                                 context.arc(center.x, center.y, 20, 1.15 * Math.PI, 0.85 * Math.PI); // half circle
                                 context.lineTo(center.x, center.y);
-                                context.fillStyle = pac_color; //color 
+                                context.fillStyle = m_PacColor; //color 
                                 context.fill();
                                 context.beginPath();
                                 context.arc(center.x + 5, center.y - 13, 4, 0, 2 * Math.PI); // circle
@@ -295,11 +302,11 @@
                                 context.fill();
                             }
                             //Right
-                            if(m_pac_direction == 4){
+                            if(m_PacDirection == 4){
                                 context.beginPath();
                                 context.arc(center.x, center.y, 20, 0.15 * Math.PI, 1.85 * Math.PI); // half circle
                                 context.lineTo(center.x, center.y);
-                                context.fillStyle = pac_color; //color 
+                                context.fillStyle = m_PacColor; //color 
                                 context.fill();
                                 context.beginPath();
                                 context.arc(center.x + 5, center.y - 13, 4, 0, 2 * Math.PI); // circle
@@ -351,34 +358,40 @@
                             base_image.src = 'ghost3.png';
                             context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
                         }
+                        //draw Ghost4
+                        else if (board[i][j] == 10) {
+                        console.log("I am Here")
+                        base_image = new Image();
+                        base_image.src = 'ghost4.png';
+                        context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
+                        }
                     }
                 }
             }
 
             //Makes the ghosts chase Pacman
             function UpdatePositionGhosts(){
-                if(m1_pos.i < shape.i && board[m1_pos.i+1][m1_pos.j]!=4 && board[m1_pos.i+1][m1_pos.j]!=5 && board[m1_pos.i+1][m1_pos.j]!=6) {
-                        board[m1_pos.i][m1_pos.j] = prev;
-                        prev = board[m1_pos.i+1][m1_pos.j];
-                        m1_pos.i++;
-                        board[m1_pos.i][m1_pos.j]=3;
+                //Ghost1: 3, Ghost2:5, Ghost3:6, Ghost4:10
+                if(m_GhostNum ==1){
+                    FirstGhostMovement();
                 }
-                else if(m1_pos.j < shape.j && board[m1_pos.i][m1_pos.j+1]!=4 && board[m1_pos.i+1][m1_pos.j]!=5 && board[m1_pos.i+1][m1_pos.j]!=6){
-                    board[m1_pos.i][m1_pos.j] = prev;
-                    prev = board[m1_pos.i][m1_pos.j+1];
-                    m1_pos.j++;
-                    board[m1_pos.i][m1_pos.j]=3;
+                if(m_GhostNum ==2){
+                    FirstGhostMovement();
+                    SecondGhostMovement();
                 }
-                else if(m1_pos.i > shape.i){
-                    if(board[m1_pos.i-1][m1_pos.j]!=4 && board[m1_pos.i+1][m1_pos.j]!=5 && board[m1_pos.i+1][m1_pos.j]!=6){
-                        board[m1_pos.i][m1_pos.j] = prev;
-                        prev = board[m1_pos.i-1][m1_pos.j];
-                        m1_pos.i--;
-                        board[m1_pos.i][m1_pos.j]=3;
-                    }
+                if(m_GhostNum ==3){
+                    FirstGhostMovement();
+                    SecondGhostMovement();
+                    ThirdGhostMovement();
                 }
-                if(prev==2){
-                    prev=0;
+                if(m_GhostNum ==4){
+                    FirstGhostMovement();
+                    SecondGhostMovement();
+                    ThirdGhostMovement();
+                    FourthGhostMovement();
+                }
+                if(m_prev==2){
+                    m_prev=0;
                 }
             }
 
@@ -394,7 +407,7 @@
                 	if(shape.j>0 && board[shape.i][shape.j-1]!=4)
                 	{
                 		shape.j--;
-                        m_pac_direction = 1;
+                        m_PacDirection = 1;
                 	}
                 }
                 //Move Pacman Down
@@ -403,7 +416,7 @@
                 	if(shape.j<17 && board[shape.i][shape.j+1]!=4)
                 	{
                 		shape.j++;
-                        m_pac_direction = 2;
+                        m_PacDirection = 2;
                 	}
                 }
                 //Move Pacman To The Right
@@ -412,7 +425,7 @@
                 	if(shape.i>0 && board[shape.i-1][shape.j]!=4)
                 	{
                 		shape.i--;
-                        m_pac_direction = 3;
+                        m_PacDirection = 3;
                 	}
                 }
                 //Move Pacman To The Left
@@ -421,58 +434,58 @@
                 	if(shape.i<17 && board[shape.i+1][shape.j]!=4)
                 	{
                 		shape.i++;
-                        m_pac_direction = 4;
+                        m_PacDirection = 4;
                 	}
                 }
                 //Pacman moves to a place where there is food
                 if(board[shape.i][shape.j]==7)
                 {
-                	score = score + m_FirstBallScore;
+                	m_GameScore = m_GameScore + m_FirstBallScore;
                 }
                 if(board[shape.i][shape.j]==8)
                 {
-                	score = score + m_SecondBallScore;
+                	m_GameScore = m_GameScore + m_SecondBallScore;
                 }
                 if(board[shape.i][shape.j]==9)
                 {
-                	score = score + m_ThirdBallScore;
+                	m_GameScore = m_GameScore + m_ThirdBallScore;
                 }
                 board[shape.i][shape.j]=2; //Draw pacman in his new position
                 var currentTime=new Date();
-                time_elapsed=(currentTime-start_time)/1000;
+                time_elapsed=(currentTime-m_StartTime)/1000;
 
                 /*
                 In case of a ghost catching pacman
                 */
-                if((shape.i==m1_pos.i && shape.j==m1_pos.j) || (shape.i==m2_pos.i && shape.j==m2_pos.j) || ((shape.i==m3_pos.i && shape.j==m3_pos.j))){
+                if((shape.i==FirstGhostPosition.i && shape.j==FirstGhostPosition.j) || (shape.i==SecondGhostPosition.i && shape.j==SecondGhostPosition.j) || ((shape.i==ThirdGhostPosition.i && shape.j==ThirdGhostPosition.j))){
                     board[shape.i][shape.j] = 0;
-                    board[m1_pos.i][m1_pos.j] = 0;
-                    score-=10;
-                    catched++;
-                    livesUser--;
-                    m1_pos.i=1;
-                    m1_pos.j=1;
-                    board[m1_pos.i][m1_pos.j] = 3;
+                    board[FirstGhostPosition.i][FirstGhostPosition.j] = 0;
+                    m_GameScore-=10;
+                    m_TimesCatched++;
+                    m_livesUser--;
+                    FirstGhostPosition.i=1;
+                    FirstGhostPosition.j=1;
+                    board[FirstGhostPosition.i][FirstGhostPosition.j] = 3;
                     var emptyCell = findRandomEmptyCell(board);
                     shape.i=emptyCell[0];
                     shape.j=emptyCell[1];
-                    if(livesUser==0){
+                    if(m_livesUser==0){
                         window.clearInterval(interval);
                         window.alert("Game lost");
-                        m_game_over = true;
+                        m_GameOver = true;
                         playMusic();
                     }
                 }
 
-            	if(score>=20&&time_elapsed<=10)
+            	if(m_GameScore>=20&&time_elapsed<=10)
             	{
-            		pac_color="green";
+            		m_PacColor="green";
             	}
-            	if(score==(150-10*catched))
+            	if(m_GameScore==(150-10*m_TimesCatched))
             	{
             		window.clearInterval(interval);
             		window.alert("Game completed");
-                    m_game_won = true;
+                    m_GameWon = true;
                     playMusic();
             	}
             	else
@@ -484,22 +497,116 @@
             //     Start();
             // });
             function playMusic() {
-            if(m_game_over == false && m_game_won ==false){
+            if(m_GameOver == false && m_GameWon ==false){
                 var dbgt_audio = document.getElementById("DBGT");
                 dbgt_audio.play();
             }
-            if(m_game_over == true){
+            if(m_GameOver == true){
                 dbgt_audio.pause();
                 var GameOverAudio = document.getElementById("GameOver");
                 GameOverAudio.play();
             }
-            if(m_game_won == true){
+            if(m_GameWon == true){
                 dbgt_audio.pause();
                 var GameWonAudio = document.getElementById("GameWon");
                 GameWonAudio.play();
             }
 
                 }
+
+            function FirstGhostMovement(){
+                if(FirstGhostPosition.i < shape.i && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=4 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=5 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=6 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=10) {
+                        board[FirstGhostPosition.i][FirstGhostPosition.j] = m_prev;
+                        m_prev = board[FirstGhostPosition.i+1][FirstGhostPosition.j];
+                        FirstGhostPosition.i++;
+                        board[FirstGhostPosition.i][FirstGhostPosition.j]=3;
+                }
+                else if(FirstGhostPosition.j < shape.j && board[FirstGhostPosition.i][FirstGhostPosition.j+1]!=4 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=5 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=6 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=10){
+                    board[FirstGhostPosition.i][FirstGhostPosition.j] = m_prev;
+                    m_prev = board[FirstGhostPosition.i][FirstGhostPosition.j+1];
+                    FirstGhostPosition.j++;
+                    board[FirstGhostPosition.i][FirstGhostPosition.j]=3;
+                }
+                else if(FirstGhostPosition.i > shape.i){
+                    if(board[FirstGhostPosition.i-1][FirstGhostPosition.j]!=4 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=5 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=6 && board[FirstGhostPosition.i+1][FirstGhostPosition.j]!=10){
+                        board[FirstGhostPosition.i][FirstGhostPosition.j] = m_prev;
+                        m_prev = board[FirstGhostPosition.i-1][FirstGhostPosition.j];
+                        FirstGhostPosition.i--;
+                        board[FirstGhostPosition.i][FirstGhostPosition.j]=3;
+                    }
+                }
+            }
+
+            function SecondGhostMovement(){
+                return 1;
+            }
+
+            function ThirdGhostMovement(){
+                return 1;
+            }
+
+            function FourthGhostMovement(){
+                return 1;
+            }
+
+            /**
+             *     public boolean legalMove(String direction)
+    {
+        int thisRow = playerRow;
+        int thisCol = playerCol;
+
+        if(direction.equals("up"))
+        {
+            if((thisRow - 1 < 0) || (maze.getMazeArr()[thisRow - 1][thisCol] == 1))
+                return false;
+        }
+        else if (direction.equals("up right"))
+        {
+            if((thisRow - 1 < 0) || (thisCol + 1 >= maze.getMax_columns()) || (maze.getMazeArr()[thisRow - 1][thisCol + 1] == 1))
+                return false;
+            if((maze.getMazeArr()[thisRow - 1][thisCol] == 1) && (maze.getMazeArr()[thisRow][thisCol + 1] == 1))
+                return false;
+        }
+        else if (direction.equals("right"))
+        {
+            if((thisCol + 1 >= maze.getMax_columns()) || (maze.getMazeArr()[thisRow][thisCol + 1] == 1))
+                return false;
+        }
+        else if (direction.equals("down right"))
+        {
+            if((thisRow + 1 >= maze.getMax_rows()) || (thisCol + 1 >= maze.getMax_columns()) || (maze.getMazeArr()[thisRow + 1][thisCol + 1] == 1))
+                return false;
+            if((maze.getMazeArr()[thisRow + 1][thisCol] == 1) && (maze.getMazeArr()[thisRow][thisCol + 1] == 1))
+                return false;
+        }
+        else if (direction.equals("down"))
+        {
+            if((thisRow + 1 >= maze.getMax_rows()) || (maze.getMazeArr()[thisRow + 1][thisCol] == 1))
+                return false;
+        }
+        else if (direction.equals("down left"))
+        {
+            if((thisRow + 1 >= maze.getMax_rows()) || (thisCol - 1 < 0) || (maze.getMazeArr()[thisRow + 1][thisCol - 1] == 1))
+                return false;
+            if((maze.getMazeArr()[thisRow + 1][thisCol] == 1) && (maze.getMazeArr()[thisRow][thisCol - 1] == 1))
+                return false;
+        }
+        else if (direction.equals("left"))
+        {
+            if((thisCol - 1 < 0) || (maze.getMazeArr()[thisRow][thisCol - 1] == 1))
+                return false;
+        }
+        else if (direction.equals("up left"))
+        {
+            if((thisRow - 1 < 0) || (thisCol - 1 < 0) || (maze.getMazeArr()[thisRow - 1][thisCol - 1] == 1))
+                return false;
+            if((maze.getMazeArr()[thisRow - 1][thisCol] == 1) && (maze.getMazeArr()[thisRow][thisCol - 1] == 1))
+                return false;
+        }
+
+        return true;
+    }
+            */
         </script>
 
         
