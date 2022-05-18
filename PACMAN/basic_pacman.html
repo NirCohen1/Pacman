@@ -35,7 +35,7 @@
             var m2_prev;
             var m3_prev;
 
-            var lives;
+            var livesUser;
             var catched; 
             var board;
             var score;
@@ -45,13 +45,19 @@
             var interval;
 
             //scores for each ball
-            var m_RedScore = 5; 
-            var m_GreenScore = 15; 
-            var m_DragonScore = 25;
+            var m_FirstBallScore = 5; 
+            var m_SecondBallScore = 15; 
+            var m_ThirdBallScore = 25;
 
             //has the game been completed
             var m_game_won = false;
             var m_game_over = false;
+
+            //Game Keys Values
+            var KeyUpUser = 38;
+            var KeyDownUser = 40
+            var KeyLeftUser = 37;
+            var KeyRightUser = 39;
 
 
             
@@ -76,12 +82,12 @@
             var cnt = 288;
             var food_remain = 90;
             var pacman_remain = 1;
-            lives = 5;
+            livesUser = 5;
             start_time= new Date();
             special=1;
-            var m_RedBallsNum = Math.round(0.6*m_TotalBalls);
-            var m_GreenBallsNum= Math.round(0.3*m_TotalBalls);;
-            var m_DragonBallsNum= Math.round(0.1*m_TotalBalls);;
+            var m_FirstBallNum = Math.round(0.6*m_TotalBalls);
+            var m_SecondBallNum= Math.round(0.3*m_TotalBalls);;
+            var m_ThirdBallNum= Math.round(0.1*m_TotalBalls);;
 
 
             board = [
@@ -114,11 +120,6 @@
             tempRed = Math.floor(0.6*food_remain);
             tempGreen = Math.floor(0.3*food_remain);
             tempDragon = Math.floor(0.1*food_remain);
-            console.log(tempRed);
-            console.log(tempGreen);
-            console.log(tempDragon);
-            
-            
             
             /*
             2 = pacman
@@ -215,19 +216,19 @@
             //Receive as input the key on which the user clicks and return value accordingly
             function GetKeyPressed() {
                 //ArrowUp
-                if (keysDown[38]) {
+                if (keysDown[KeyUpUser]) {
                     return 1;
                 }
                 //ArrowDown
-                if (keysDown[40]) { 
+                if (keysDown[KeyDownUser]) { 
                     return 2;
                 }
                 //ArrowLeft
-                if (keysDown[37]) { 
+                if (keysDown[KeyLeftUser]) { 
                     return 3;
                 }
                 //ArrowRight
-                if (keysDown[39]) { 
+                if (keysDown[KeyRightUser]) { 
                     return 4;
                 }
             }
@@ -244,7 +245,7 @@
             	canvas.width=canvas.width; //clean board
                 lblScore.value = score;
                 lblTime.value = time_elapsed;
-                LivesLeft.value = lives;
+                LivesLeft.value = livesUser;
 
                 context.fillStyle = "black";
                 context.fillRect(0, 0, canvas.width, canvas.height);
@@ -426,15 +427,15 @@
                 //Pacman moves to a place where there is food
                 if(board[shape.i][shape.j]==7)
                 {
-                	score = score + m_RedScore;
+                	score = score + m_FirstBallScore;
                 }
                 if(board[shape.i][shape.j]==8)
                 {
-                	score = score + m_GreenScore;
+                	score = score + m_SecondBallScore;
                 }
                 if(board[shape.i][shape.j]==9)
                 {
-                	score = score + m_DragonScore;
+                	score = score + m_ThirdBallScore;
                 }
                 board[shape.i][shape.j]=2; //Draw pacman in his new position
                 var currentTime=new Date();
@@ -448,14 +449,14 @@
                     board[m1_pos.i][m1_pos.j] = 0;
                     score-=10;
                     catched++;
-                    lives--;
+                    livesUser--;
                     m1_pos.i=1;
                     m1_pos.j=1;
                     board[m1_pos.i][m1_pos.j] = 3;
                     var emptyCell = findRandomEmptyCell(board);
                     shape.i=emptyCell[0];
                     shape.j=emptyCell[1];
-                    if(lives==0){
+                    if(livesUser==0){
                         window.clearInterval(interval);
                         window.alert("Game lost");
                         m_game_over = true;
