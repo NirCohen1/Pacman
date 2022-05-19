@@ -724,6 +724,9 @@
                     if(GhostPrevDir.localeCompare("DOWN") != 0){
                         return "UP"
                     }
+                    if(Math.min(DownDist, LeftDist, RightDist) == Infinity){
+                        return "UP";
+                    }
                     if(Math.min(DownDist, LeftDist, RightDist) == DownDist){
                         return "DOWN";
                     }
@@ -738,6 +741,9 @@
                 if(Math.min(UpDist, DownDist, LeftDist, RightDist) == DownDist){
                     if(GhostPrevDir.localeCompare("UP") != 0){
                         return "DOWN"
+                    }
+                    if(Math.min(UpDist, LeftDist, RightDist) == Infinity){
+                        return "DOWN";
                     }
                     if(Math.min(UpDist, LeftDist, RightDist) == UpDist){
                         return "UP";
@@ -755,6 +761,9 @@
                     if(GhostPrevDir.localeCompare("RIGHT") != 0){
                         return "LEFT"
                     }
+                    if(Math.min(UpDist, DownDist, RightDist) == Infinity){
+                        return "LEFT";
+                    }
                     if(Math.min(UpDist, DownDist, RightDist) == UpDist){
                         return "UP";
                     }
@@ -770,6 +779,9 @@
                 if(Math.min(UpDist, DownDist, LeftDist, RightDist) == RightDist){
                     if(GhostPrevDir.localeCompare("LEFT") != 0){
                         return "RIGHT"
+                    }
+                    if(Math.min(UpDist, DownDist, LeftDist) == Infinity){
+                        return "RIGHT";
                     }
                     if(Math.min(UpDist, DownDist, LeftDist) == UpDist){
                         return "UP";
