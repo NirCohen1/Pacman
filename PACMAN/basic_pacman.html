@@ -515,15 +515,9 @@
                     board[SecondGhostPosition.i][SecondGhostPosition.j] = 5;
                     board[ThirdGhostPosition.i][ThirdGhostPosition.j] = 6;
                     board[FourthGhostPosition.i][FourthGhostPosition.j] = 10;
-                    var i = Math.floor((Math.random() * 9) + 1);
-             	    var j = Math.floor((Math.random() * 9) + 1);
-                    while(board[i][j]!=0 && board[i][j]!=7 && board[i][j]!=8 && board[i][j]!=9 && board[i][j]!=3 && board[i][j]!=4 && board[i][j]!=5 && board[i][j]!=4 && board[i][j]!=10)
-                    {
-                        i = Math.floor((Math.random() * 9) + 1);
-                        j = Math.floor((Math.random() * 9) + 1);
-                    }
-                    m_PacmanPosition.i=i;
-                    m_PacmanPosition.j=j;
+                    emptyCell = findRandomEmptyCell(board)
+                    m_PacmanPosition.i=emptyCell[0];
+                    m_PacmanPosition.j=emptyCell[1];
                     if(m_livesUser==0){
                         window.clearInterval(interval);
                         window.alert("Loser!!!");
