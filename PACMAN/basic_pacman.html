@@ -40,12 +40,16 @@
             var SecondGhostPosition=new Object(); //Position of Second Ghost
             var ThirdGhostPosition=new Object(); //Position of Third Ghost
             var FourthGhostPosition=new Object(); //Position of Fourth Ghost
-            var m_PillPrevPosition=new Object(); //curernt Position of Pill
-            var m_ClockPrevPosition=new Object(); //curernt Position of Clock
-            m_PillPrevPosition.i = 500;
-            m_PillPrevPosition.j = 500;
-            m_ClockPrevPosition.i = 600;
-            m_ClockPrevPosition.j = 600;
+            var m_PillCurrPosition=new Object(); //curernt Position of Pill
+            var m_ClockCurrPosition=new Object(); //curernt Position of Clock
+            var m_DBCurrPosition=new Object(); //curernt Position of DB
+            var directions = new Object();
+            m_PillCurrPosition.i = 500;
+            m_PillCurrPosition.j = 500;
+            m_ClockCurrPosition.i = 600;
+            m_ClockCurrPosition.j = 600;
+            m_DBCurrPosition.i = 9;
+            m_DBCurrPosition.j = 9;
             var bonus_pos=new Object(); 
             
             var special_pos=new Object();
@@ -55,6 +59,8 @@
             var m_GhostTwoPrev = 0;
             var m_GhostThreePrev = 0;
             var m_GhostFourPrev = 0;
+            var m_DBPrev = 0;
+            var m_DBCaught = false;
             
 
 
@@ -116,7 +122,7 @@
 
 
             board = [
-            [4, 4, 4, 4, 4 ,4 ,4 ,0 ,0, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+            [4, 4, 4, 4, 4 ,4 ,4 ,4 ,4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
             [4, 3, 0, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 10, 4],
             [4, 0, 4, 4, 4 ,0 ,4 ,4 ,4, 0, 4, 4, 4, 0, 4, 4, 0, 4],
             [4, 0, 4, 0, 0 ,0 ,4 ,0 ,4, 0, 4, 0, 4, 0, 0, 0, 0, 4],
@@ -133,7 +139,7 @@
             [4, 0, 4, 0, 0 ,0 ,4 ,0 ,0, 0, 4, 4, 4, 0, 4, 4, 0, 4],
             [4, 0, 4, 4, 4 ,0 ,4 ,4 ,4, 0, 4, 0, 0, 0, 4, 4, 0, 4],
             [4, 6, 0, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0, 5, 4],
-            [4, 4, 4, 4, 4, 4, 4, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+            [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
             ]
 
                         
@@ -189,6 +195,7 @@
             9 = DragonBall
             11 = Pill
             12 = Clock
+            13 = DragonBall(Moving)
             */
             for (var i = 0; i < 18; i++) { //18 is the number of rows and columns
                 for (var j = 0; j < 18; j++) {
@@ -263,21 +270,26 @@
             addEventListener("keyup", function (e) {
                 keysDown[e.keyCode] = false;
             }, false);
+            board[9][9] = 13;
             interval=setInterval(UpdatePosition, 150);
             interval=setInterval(UpdatePositionGhosts, 600);
             interval=setInterval(PutPillsOnMap, 7200);
             interval=setInterval(PutClockOnMap, 8000);
+            interval=setInterval(PutDBOnMap, 1000);
                 }
             
             //Find Cells For the balls
             function findRandomEmptyCell(board){
              	var i = Math.floor((Math.random() * 9) + 1);
              	var j = Math.floor((Math.random() * 9) + 1);
-                if(board[i][j] == 0){
+                if((i==1 && j==1) || (i==1 && j==16) || (i==16 && j==1) || (i==16 && j==16)){
+                    var Corner = true;
+                }
+                if(board[i][j] == 0 && Corner == false){
                     return [i,j];      
                 }
                 else{
-                    while(board[i][j] != 0){
+                    while(board[i][j] != 0 || (i==1 && j==1) || (i==1 && j==16) || (i==16 && j==1) || (i==16 && j==16)  ){
                     i = Math.floor((Math.random() * 9) + 1);
              		j = Math.floor((Math.random() * 9) + 1);
                     }
@@ -286,23 +298,75 @@
             }
 
             function PutPillsOnMap(){
-                if(m_PillPrevPosition.i != 500){
-                    board[m_PillPrevPosition.i][m_PillPrevPosition.j]=0;
+                if(m_PillCurrPosition.i != 500){
+                    board[m_PillCurrPosition.i][m_PillCurrPosition.j]=0;
                 }
                 emptyCell = findRandomEmptyCell(board);
                 board[emptyCell[0]][emptyCell[1]]=11; //pill
-                m_PillPrevPosition.i = emptyCell[0];
-                m_PillPrevPosition.j = emptyCell[1];
+                m_PillCurrPosition.i = emptyCell[0];
+                m_PillCurrPosition.j = emptyCell[1];
             }
 
             function PutClockOnMap(){
-                if(m_ClockPrevPosition.i != 600){
-                    board[m_ClockPrevPosition.i][m_ClockPrevPosition.j]=0;
+                if(m_ClockCurrPosition.i != 600){
+                    board[m_ClockCurrPosition.i][m_ClockCurrPosition.j]=0;
                 }
                 emptyCell = findRandomEmptyCell(board);
-                board[emptyCell[0]][emptyCell[1]]=12; //pill
-                m_ClockPrevPosition.i = emptyCell[0];
-                m_ClockPrevPosition.j = emptyCell[1];
+                board[emptyCell[0]][emptyCell[1]]=12; //clock
+                m_ClockCurrPosition.i = emptyCell[0];
+                m_ClockCurrPosition.j = emptyCell[1];
+            }
+
+            function PutDBOnMap(){
+                if(m_DBCaught == true){
+                    return null;
+                }
+                directions =[];
+                //check for collision before moving
+                if(board[m_DBCurrPosition.i][m_DBCurrPosition.j-1] != 4 && board[m_DBCurrPosition.i][m_DBCurrPosition.j-1] != 3 && board[m_DBCurrPosition.i][m_DBCurrPosition.j-1] != 5 && board[m_DBCurrPosition.i][m_DBCurrPosition.j-1] != 6 && board[m_DBCurrPosition.i][m_DBCurrPosition.j-1] != 10 && board[m_DBCurrPosition.i][m_DBCurrPosition.j-1] != 2){
+                    directions.push("UP")
+                }
+                if(board[m_DBCurrPosition.i][m_DBCurrPosition.j+1] != 4 && board[m_DBCurrPosition.i][m_DBCurrPosition.j+1] != 3 && board[m_DBCurrPosition.i][m_DBCurrPosition.j+1] != 5 && board[m_DBCurrPosition.i][m_DBCurrPosition.j+1] != 6 && board[m_DBCurrPosition.i][m_DBCurrPosition.j+1] != 10 && board[m_DBCurrPosition.i][m_DBCurrPosition.j+1] != 2){
+                    directions.push("DOWN")
+                }
+                if(board[m_DBCurrPosition.i-1][m_DBCurrPosition.j] != 4 && board[m_DBCurrPosition.i-1][m_DBCurrPosition.j] != 3 && board[m_DBCurrPosition.i-1][m_DBCurrPosition.j] != 5 && board[m_DBCurrPosition.i-1][m_DBCurrPosition.j] != 6 && board[m_DBCurrPosition.i-1][m_DBCurrPosition.j] != 10 && board[m_DBCurrPosition.i-1][m_DBCurrPosition.j] != 2){
+                    directions.push("LEFT")
+                }
+                if(board[m_DBCurrPosition.i+1][m_DBCurrPosition.j] != 4 && board[m_DBCurrPosition.i+1][m_DBCurrPosition.j] != 3 && board[m_DBCurrPosition.i+1][m_DBCurrPosition.j] != 5 && board[m_DBCurrPosition.i+1][m_DBCurrPosition.j] != 6 && board[m_DBCurrPosition.i+1][m_DBCurrPosition.j] != 10 && board[m_DBCurrPosition.i+1][m_DBCurrPosition.j] != 2){
+                    directions.push("RIGHT")
+                }
+                if(directions.length == 0){
+                    return null;
+                }
+                rand_num = getRandomIntInclusive(0,directions.length-1);
+                PrefferdDirectionDB=directions[rand_num];
+                if(PrefferdDirectionDB.localeCompare("UP") == 0){
+                    board[m_DBCurrPosition.i][m_DBCurrPosition.j] = m_DBPrev;
+                    m_DBPrev = board[m_DBCurrPosition.i][m_DBCurrPosition.j-1];
+                    m_DBCurrPosition.j--;
+                    board[m_DBCurrPosition.i][m_DBCurrPosition.j]=13;
+                }
+                if(PrefferdDirectionDB.localeCompare("DOWN") == 0){
+                    board[m_DBCurrPosition.i][m_DBCurrPosition.j] = m_DBPrev;
+                    m_DBPrev = board[m_DBCurrPosition.i][m_DBCurrPosition.j+1];
+                    m_DBCurrPosition.j++;
+                    board[m_DBCurrPosition.i][m_DBCurrPosition.j]=13;
+                }
+                if(PrefferdDirectionDB.localeCompare("LEFT") == 0){
+                    board[m_DBCurrPosition.i][m_DBCurrPosition.j] = m_DBPrev; //place the food back if there was one
+                    m_DBPrev = board[m_DBCurrPosition.i-1][m_DBCurrPosition.j]; //keep whats in the tile before moving for later
+                    m_DBCurrPosition.i--; //move LEFT
+                    board[m_DBCurrPosition.i][m_DBCurrPosition.j]=13; //Update
+                }
+                if(PrefferdDirectionDB.localeCompare("RIGHT") == 0){
+                    board[m_DBCurrPosition.i][m_DBCurrPosition.j] = m_DBPrev;
+                    m_DBPrev = board[m_DBCurrPosition.i+1][m_DBCurrPosition.j];
+                    m_DBCurrPosition.i++;
+                    board[m_DBCurrPosition.i][m_DBCurrPosition.j]=13;
+                }
+
+
+                
             }
 
             //Receive as input the key on which the user clicks and return value accordingly
@@ -327,9 +391,13 @@
 
             //Allow the user to enter random game values
             function Randomize() {
-                m_GhostNum = Math.floor(Math.random() * 4);
+                m_GhostNum = getRandomIntInclusive(1,4);
                 m_TotalBalls = Math.floor(Math.random() * 51) + 40;
                 m_MaxTime = 60 + Math.floor(Math.random() * 150);
+                var m_KeyUpUser = 38;
+                var m_KeyDownUser = 40
+                var m_KeyLeftUser = 37;
+                var m_KeyRightUser = 39;
             }
 
 
@@ -463,6 +531,12 @@
                         base_image.src = 'ClockPeterPan.jpg';
                         context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
                         }
+                        //draw DB
+                        else if (board[i][j] == 13 && i == m_DBCurrPosition.i && j == m_DBCurrPosition.j) {
+                        base_image = new Image();
+                        base_image.src = 'Dragonball.png';
+                        context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
+                        }
                     }
                 }
             }
@@ -556,6 +630,22 @@
                 if(board[m_PacmanPosition.i][m_PacmanPosition.j]==12)
                 {
                     m_ClocksTaken +=1;
+                }
+                //Pacman moves to a place where there is a DB
+                if(board[m_PacmanPosition.i][m_PacmanPosition.j]==13)
+                {
+                    m_GameScore = m_GameScore + 50;
+                    m_TargetScore = m_TargetScore + 50;
+                    if(m_DBPrev == 7){
+                        m_GameScore = m_GameScore + m_FirstBallScore;
+                    }
+                    if(m_DBPrev == 8){
+                        m_GameScore = m_GameScore + m_SecondBallScore;
+                    }
+                    if(m_DBPrev == 9){
+                        m_GameScore = m_GameScore + m_ThirdBallScore;
+                    }
+                    m_DBCaught = true;
                 }
                 board[m_PacmanPosition.i][m_PacmanPosition.j]=2; //Draw pacman in his new position
                 var currentTime=new Date();
@@ -996,6 +1086,12 @@
                     }
                 }
             }
+
+            function getRandomIntInclusive(min, max) {
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+            }   
 
 
         </script>
