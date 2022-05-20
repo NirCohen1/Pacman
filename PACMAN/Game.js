@@ -283,7 +283,7 @@ function getRandomIntInclusive(min, max) {
 
 function Draw() {
     canvas.width=canvas.width; //clean board
-    lblScore.value = score;
+    Score.value = score;
     lblTime.value = time_elapsed;
     
     LivesLeft.value = m_livesUser;
@@ -536,6 +536,14 @@ function UpdatePosition() {
             document.getElementById("canvas").style.display = "none";
             document.getElementById("start_game").style.display = "block";
         }
+        if(lblTime.value < 0){
+            window.alert("Loser!!!");
+            m_GameOver = true;
+            playMusic();
+            document.getElementById("canvas").style.display = "none";
+            document.getElementById("start_game").style.display = "block";
+        }
+            
     }
     if (m_GameScore === m_TargetScore) {
         window.clearInterval(intervalClock);
