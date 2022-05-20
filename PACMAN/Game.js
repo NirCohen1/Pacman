@@ -549,6 +549,17 @@ function UpdatePosition() {
         document.getElementById("canvas").style.display = "none";
         document.getElementById("start_game").style.display = "block";
     }
+    if(lblTime.value < 0){
+        if(m_GameScore< 100){
+            window.clearInterval(interval);
+            window.alert("You are better than " + m_GameScore +" Points");
+        }
+        else{
+            window.clearInterval(interval);
+            window.alert("Winner!!!");
+        }
+        m_GameOver = true;
+    }
     else{
         Draw();
     }
