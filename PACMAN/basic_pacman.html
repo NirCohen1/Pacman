@@ -141,6 +141,31 @@
 
             FourthGhostPosition.i=1;
             FourthGhostPosition.j=16;
+
+            if(m_GhostNum == 1){
+                board[SecondGhostPosition.i][SecondGhostPosition.j] = 0;
+                board[ThirdGhostPosition.i][ThirdGhostPosition.j] = 0;
+                board[FourthGhostPosition.i][FourthGhostPosition.j] = 0;
+                SecondGhostPosition.i=10000000;
+                SecondGhostPosition.j=10000000;
+                ThirdGhostPosition.i=10000000;
+                ThirdGhostPosition.j=10000000;
+                FourthGhostPosition.i=10000000;
+                FourthGhostPosition.j=10000000;
+            }
+            if(m_GhostNum == 2){
+                board[ThirdGhostPosition.i][ThirdGhostPosition.j] = 0;
+                board[FourthGhostPosition.i][FourthGhostPosition.j] = 0;
+                ThirdGhostPosition.i=10000000;
+                ThirdGhostPosition.j=10000000;
+                FourthGhostPosition.i=10000000;
+                FourthGhostPosition.j=10000000;
+            }
+            if(m_GhostNum == 3){
+                board[FourthGhostPosition.i][FourthGhostPosition.j] = 0;
+                FourthGhostPosition.i=10000000;
+                FourthGhostPosition.j=10000000;
+            }
             
             tempRed = Math.floor(0.6*food_remain);
             tempGreen = Math.floor(0.3*food_remain);
@@ -495,10 +520,24 @@
                 */
                 if((m_PacmanPosition.i==FirstGhostPosition.i && m_PacmanPosition.j==FirstGhostPosition.j) || (m_PacmanPosition.i==SecondGhostPosition.i && m_PacmanPosition.j==SecondGhostPosition.j) || ((m_PacmanPosition.i==ThirdGhostPosition.i && m_PacmanPosition.j==ThirdGhostPosition.j) || ((m_PacmanPosition.i==FourthGhostPosition.i && m_PacmanPosition.j==FourthGhostPosition.j)))){
                     board[m_PacmanPosition.i][m_PacmanPosition.j] = 0;
-                    board[FirstGhostPosition.i][FirstGhostPosition.j] = m_GhostOnePrev;
-                    board[SecondGhostPosition.i][SecondGhostPosition.j] = m_GhostTwoPrev;
-                    board[ThirdGhostPosition.i][ThirdGhostPosition.j] = m_GhostThreePrev;
-                    board[FourthGhostPosition.i][FourthGhostPosition.j] = m_GhostFourPrev;
+                    if(m_GhostNum == 1){
+                        board[FirstGhostPosition.i][FirstGhostPosition.j] = m_GhostOnePrev;
+                    }
+                    if(m_GhostNum == 2){
+                        board[FirstGhostPosition.i][FirstGhostPosition.j] = m_GhostOnePrev;
+                        board[SecondGhostPosition.i][SecondGhostPosition.j] = m_GhostTwoPrev;
+                    }
+                    if(m_GhostNum == 3){
+                        board[FirstGhostPosition.i][FirstGhostPosition.j] = m_GhostOnePrev;
+                        board[SecondGhostPosition.i][SecondGhostPosition.j] = m_GhostTwoPrev;
+                        board[ThirdGhostPosition.i][ThirdGhostPosition.j] = m_GhostThreePrev;
+                    }
+                    if(m_GhostNum == 4){
+                        board[FirstGhostPosition.i][FirstGhostPosition.j] = m_GhostOnePrev;
+                        board[SecondGhostPosition.i][SecondGhostPosition.j] = m_GhostTwoPrev;
+                        board[ThirdGhostPosition.i][ThirdGhostPosition.j] = m_GhostThreePrev;
+                        board[FourthGhostPosition.i][FourthGhostPosition.j] = m_GhostFourPrev;
+                    }
                     m_GhostOnePrev = 0;
                     m_GhostTwoPrev = 0;
                     m_GhostThreePrev = 0;
@@ -515,10 +554,48 @@
                     ThirdGhostPosition.j=1;
                     FourthGhostPosition.i=1;
                     FourthGhostPosition.j=16;
-                    board[FirstGhostPosition.i][FirstGhostPosition.j] = 3;
-                    board[SecondGhostPosition.i][SecondGhostPosition.j] = 5;
-                    board[ThirdGhostPosition.i][ThirdGhostPosition.j] = 6;
-                    board[FourthGhostPosition.i][FourthGhostPosition.j] = 10;
+                    if(m_GhostNum == 1){
+                        board[SecondGhostPosition.i][SecondGhostPosition.j] = 0;
+                        board[ThirdGhostPosition.i][ThirdGhostPosition.j] = 0;
+                        board[FourthGhostPosition.i][FourthGhostPosition.j] = 0;
+                        SecondGhostPosition.i=10000000;
+                        SecondGhostPosition.j=10000000;
+                        ThirdGhostPosition.i=10000000;
+                        ThirdGhostPosition.j=10000000;
+                        FourthGhostPosition.i=10000000;
+                        FourthGhostPosition.j=10000000;
+                    }
+                    if(m_GhostNum == 2){
+                        board[ThirdGhostPosition.i][ThirdGhostPosition.j] = 0;
+                        board[FourthGhostPosition.i][FourthGhostPosition.j] = 0;
+                        ThirdGhostPosition.i=10000000;
+                        ThirdGhostPosition.j=10000000;
+                        FourthGhostPosition.i=10000000;
+                        FourthGhostPosition.j=10000000;
+                    }
+                    if(m_GhostNum == 3){
+                        board[FourthGhostPosition.i][FourthGhostPosition.j] = 0;
+                        FourthGhostPosition.i=10000000;
+                        FourthGhostPosition.j=10000000;
+                    }
+                    if(m_GhostNum == 1){
+                        board[FirstGhostPosition.i][FirstGhostPosition.j] = 3;
+                    }
+                    if(m_GhostNum == 2){
+                        board[FirstGhostPosition.i][FirstGhostPosition.j] = 3;
+                        board[SecondGhostPosition.i][SecondGhostPosition.j] = 5;
+                    }
+                    if(m_GhostNum == 3){
+                        board[FirstGhostPosition.i][FirstGhostPosition.j] = 3;
+                        board[SecondGhostPosition.i][SecondGhostPosition.j] = 5;
+                        board[ThirdGhostPosition.i][ThirdGhostPosition.j] = 6;
+                    }
+                    if(m_GhostNum == 4){
+                        board[FirstGhostPosition.i][FirstGhostPosition.j] = 3;
+                        board[SecondGhostPosition.i][SecondGhostPosition.j] = 5;
+                        board[ThirdGhostPosition.i][ThirdGhostPosition.j] = 6;
+                        board[FourthGhostPosition.i][FourthGhostPosition.j] = 10;
+                    }
                     emptyCell = findRandomEmptyCell(board)
                     m_PacmanPosition.i=emptyCell[0];
                     m_PacmanPosition.j=emptyCell[1];
