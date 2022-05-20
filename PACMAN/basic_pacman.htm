@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <audio id="DBGT" src="resources/Audio/DAN DAN DBGT.mp3"></audio>
+        <audio id="GameOver" src="/resources/Audio/Naruto sadness and sorrow.mp3"></audio>
+        <audio id="GameWon" src="/resources/Audio/Intro.mp3"></audio>
+        <button onclick="playMusic()">Play Music</button>
+        <script type="text/javascript" src="Game.js"></script>
+    </head>
+    
+    <body>SCORE:
+        Player:
+        <label for="PlayerNameLabel"></label><input id="PlayerNameLabel" type="text" />
+        SCORE:
+        <label for="lblScore"></label><input id="lblScore" type="text" />
+        TIME Left:
+        <label for="lblTime"></label><input id="lblTime" type="text" />
+        Lives Left:
+        <label for="LivesLeft"></label><input id="LivesLeft" type="text" />
+        Target Score:
+        <label for="TargetScore"></label><input id="TargetScore" type="text" />
+        <br/>
+        <canvas id="canvas" style="border: 5px solid black;" height="740" width="740"></canvas>
+
+    </body>
+
+</html>
