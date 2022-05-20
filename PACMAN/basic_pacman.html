@@ -40,6 +40,12 @@
             var SecondGhostPosition=new Object(); //Position of Second Ghost
             var ThirdGhostPosition=new Object(); //Position of Third Ghost
             var FourthGhostPosition=new Object(); //Position of Fourth Ghost
+            var m_PillPrevPosition=new Object(); //curernt Position of Pill
+            var m_ClockPrevPosition=new Object(); //curernt Position of Clock
+            m_PillPrevPosition.i = 500;
+            m_PillPrevPosition.j = 500;
+            m_ClockPrevPosition.i = 600;
+            m_ClockPrevPosition.j = 600;
             var bonus_pos=new Object(); 
             
             var special_pos=new Object();
@@ -49,6 +55,7 @@
             var m_GhostTwoPrev = 0;
             var m_GhostThreePrev = 0;
             var m_GhostFourPrev = 0;
+            
 
 
             var m_livesUser;
@@ -59,6 +66,7 @@
             var m_StartTime;
             var time_elapsed;    
             var interval;
+            var m_ClocksTaken = 0;
             var m_PlayerName = "Shachar"
 
             //scores for each ball
@@ -174,11 +182,13 @@
             
             /*
             2 = pacman
-            3,5,6 = ghosts
+            3,5,6,10 = ghosts
             4 = wall
             7 = redBall
             8 = GreenBall
             9 = DragonBall
+            11 = Pill
+            12 = Clock
             */
             for (var i = 0; i < 18; i++) { //18 is the number of rows and columns
                 for (var j = 0; j < 18; j++) {
@@ -255,6 +265,8 @@
             }, false);
             interval=setInterval(UpdatePosition, 150);
             interval=setInterval(UpdatePositionGhosts, 600);
+            interval=setInterval(PutPillsOnMap, 7200);
+            interval=setInterval(PutClockOnMap, 8000);
                 }
             
             //Find Cells For the balls
@@ -271,6 +283,26 @@
                     }
                 }
                 return [i,j];             
+            }
+
+            function PutPillsOnMap(){
+                if(m_PillPrevPosition.i != 500){
+                    board[m_PillPrevPosition.i][m_PillPrevPosition.j]=0;
+                }
+                emptyCell = findRandomEmptyCell(board);
+                board[emptyCell[0]][emptyCell[1]]=11; //pill
+                m_PillPrevPosition.i = emptyCell[0];
+                m_PillPrevPosition.j = emptyCell[1];
+            }
+
+            function PutClockOnMap(){
+                if(m_ClockPrevPosition.i != 600){
+                    board[m_ClockPrevPosition.i][m_ClockPrevPosition.j]=0;
+                }
+                emptyCell = findRandomEmptyCell(board);
+                board[emptyCell[0]][emptyCell[1]]=12; //pill
+                m_ClockPrevPosition.i = emptyCell[0];
+                m_ClockPrevPosition.j = emptyCell[1];
             }
 
             //Receive as input the key on which the user clicks and return value accordingly
@@ -419,6 +451,18 @@
                         base_image.src = 'ghost4.png';
                         context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
                         }
+                        //draw Pill
+                        else if (board[i][j] == 11) {
+                            base_image = new Image();
+                            base_image.src = 'Pill.jpg';
+                            context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
+                        }
+                        //draw Clock
+                        else if (board[i][j] == 12) {
+                        base_image = new Image();
+                        base_image.src = 'ClockPeterPan.jpg';
+                        context.drawImage(base_image, center.x-20, center.y-20, 40, 40);
+                        }
                     }
                 }
             }
@@ -451,6 +495,7 @@
             to what key has been pressed
             */
             function UpdatePosition() {
+                TouchedClock = false;
             	board[m_PacmanPosition.i][m_PacmanPosition.j]=0;
                 var x = GetKeyPressed()
                 //Move Pacman Up
@@ -502,9 +547,30 @@
                 {
                 	m_GameScore = m_GameScore + m_ThirdBallScore;
                 }
+                //Pacman moves to a place where there is a Pill
+                if(board[m_PacmanPosition.i][m_PacmanPosition.j]==11)
+                {
+                	m_livesUser += 1;
+                }
+                //Pacman moves to a place where there is a Clock
+                if(board[m_PacmanPosition.i][m_PacmanPosition.j]==12)
+                {
+                    m_ClocksTaken +=1;
+                }
                 board[m_PacmanPosition.i][m_PacmanPosition.j]=2; //Draw pacman in his new position
                 var currentTime=new Date();
-                time_elapsed=(currentTime-m_StartTime)/1000;
+                time_elapsed= -10 * m_ClocksTaken + ((currentTime-m_StartTime)/1000);
+                if(lblTime.value < 0){
+                    if(m_GameScore< 100){
+                        window.clearInterval(interval);
+                        window.alert("You are better than " + m_GameScore +" Points");
+                    }
+                    else{
+                        window.clearInterval(interval);
+                        window.alert("Winner!!!");
+                    }
+                    m_GameOver = true;
+                }
 
                 if(m_GameScore==m_TargetScore)
             	{
