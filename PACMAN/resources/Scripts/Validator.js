@@ -19,7 +19,7 @@ $(document).ready(function() {
             let user = data_base[i];
             if(user.username === loginUsernameEntry && user.password === loginPasswordEntry){
                 alert("Welcome");
-				show_game();
+				show_Setting();
                 Exist = true;
                 break;
             }
@@ -152,13 +152,16 @@ $(document).ready(function() {
 		}
 		data_base.push(new_user);
 	}
-	function show_game() {
-		document.getElementById("welcome").style.display = "none";
+	
+	function show_Setting() {
 		document.getElementById("form_page").style.display = "none";
+		document.getElementById("game").style.display = "none";
 		document.getElementById("about_dialog").style.display = "none";
-		
-		document.getElementById("game").style.display = "block";
-	}
+		document.getElementById("welcome").style.display = "none";
+		document.getElementById("canvas").style.display = "none";
+		document.getElementById("setting").style.display = "block";
+		Randomize();
+	  }
   
 	$('.message a').on('click', function() {
 		$('form').animate({

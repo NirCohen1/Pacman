@@ -11,9 +11,8 @@
   <div class="up_div"><img src="/resources/logo.png"></div>
   <script type="text/javascript" src="/resources/Scripts/Validator.js"></script>
   <script type="text/javascript" src="/resources/Scripts/about.js"></script>
-
-
-  <title>Document</title>
+  <script type="text/javascript" src="/Game.js"></script>
+  <title>Pacman Nir and Shahar</title>
 </head>
 <body class="body">
   <div class="navbar">
@@ -24,12 +23,38 @@
   </div> 
 
   <div id="game">
-    SCORE:
-    <input id="lblScore" type="text" />
-    <br/>
-    TIME:
-    <input id="lblTime" type="text" />
-    <br/>
+    <table style="width:100%">
+      <tr>
+        <th style="width: 50%;">
+          <button class="button" id="start_game" onclick="Start()">Start game</button>
+          <canvas id="canvas" style="border: 5px solid black;" height="740" width="740"></canvas>
+        </th>
+        <th>
+          <h4 style="color: white;">Player:</h4>
+          <input id="PlayerNameLabel" type="text"/>
+          <h4 style="color: white;">Score:</h4>
+          <input id="lblScore" type="text" />
+          <h4 style="color: white;">TIME Left:</h4>
+          <input id="lblTime" type="text" />
+          <h4 style="color: white;">Lives Left:</h4>
+          <input id="LivesLeft" type="text" />
+          <h4 style="color: white;">Target Score:</h4>
+          <input id="TargetScore" type="text" />
+          <br/>
+        </th>
+      </tr>
+    </table>
+  </div>
+
+  <div id="setting">
+    <h4 style="color: white;">Time:</h4>
+    <input id="TimeFrame" type="text"/>
+    <h4 style="color: white;">Balls:</h4>
+    <input id="Balls" type="text"/>
+    <h4 style="color: white;">Monsters:</h4>
+    <input id="Monsters" type="text"/>
+    <button class="button" id="random_game" onclick="Randomize()">Randomise</button>
+    <button class="button" id="start_game" onclick="Start()">Start game</button>
   </div>
 
   <div id="welcome" >
@@ -62,8 +87,6 @@
     </div>
   </div>
 
-  
-
   <section id="about_dialog" class="web_dialog">
     <table id="about_table" cellpadding="3" cellspacing="0">
        <tr id="about_table_header">
@@ -92,7 +115,7 @@
   <script>            
     document.getElementById("game").style.display = "none";  
     document.getElementById("namecheck").style.display = "none"; 
-    
+    document.getElementById("setting").style.display = "none";
     document.getElementById("form_page").style.display = "none"; 
     document.getElementById("birthdaycheck").style.display = "none"; 
     document.getElementById("about_dialog").style.display = "none"; 
@@ -104,27 +127,49 @@
     document.getElementById("game").style.display = "none";
     document.getElementById("about_dialog").style.display = "none";
     document.getElementById("sign_up").style.display = "none";
-
+    document.getElementById("setting").style.display = "none";
     document.getElementById("form_page").style.display = "block";
     document.getElementById("sign_in").style.display = "block";
+    document.getElementById("canvas").style.display = "none";
   }
   function show_welcome() {
     document.getElementById("form_page").style.display = "none";
     document.getElementById("game").style.display = "none";
     document.getElementById("about_dialog").style.display = "none";
     document.getElementById("welcome").style.display = "block";
+    document.getElementById("setting").style.display = "none";
+    document.getElementById("canvas").style.display = "none";
   }
   function show_Register() {
     document.getElementById("welcome").style.display = "none";
     document.getElementById("form_page").style.display = "none";
     document.getElementById("game").style.display = "none";
     document.getElementById("about_dialog").style.display = "none";
-    
+    document.getElementById("canvas").style.display = "none";
+    document.getElementById("setting").style.display = "none";
     document.getElementById("sign_in").style.display = "none";
     document.getElementById("form_page").style.display = "block";
     document.getElementById("sign_up").style.display = "block";
-    
   }
+
+  function show_Setting() {
+    document.getElementById("form_page").style.display = "none";
+    document.getElementById("game").style.display = "none";
+    document.getElementById("about_dialog").style.display = "none";
+    document.getElementById("welcome").style.display = "none";
+    document.getElementById("canvas").style.display = "none";
+    document.getElementById("setting").style.display = "block";
+
+  }
+  function show_game() {
+		document.getElementById("welcome").style.display = "none";
+		document.getElementById("form_page").style.display = "none";
+		document.getElementById("about_dialog").style.display = "none";
+    document.getElementById("setting").style.display = "none";
+
+		document.getElementById("game").style.display = "block";
+	}
+
 </script>
 
   <footer>
