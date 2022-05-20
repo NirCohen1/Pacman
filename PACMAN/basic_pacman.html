@@ -24,7 +24,7 @@
             var context = canvas.getContext("2d");
             var m_TargetScore = 0;
             //random
-            var m_GhostNum = 3;
+            var m_GhostNum = 4;
             var m_TotalBalls;
             var m_MaxTime = 180;
             var m_PacDirection = 4;
@@ -33,7 +33,7 @@
             var GhostOneDirection = "DOWN";
             var GhostTwoDirection="RIGHT";
             var GhostThreeDirection="RIGHT";
-            var GhostFourDirection="DOWN";
+            var GhostFourDirection="LEFT";
 
             var m_PacmanPosition=new Object();
             var FirstGhostPosition=new Object(); //Position of First Ghost
@@ -719,7 +719,57 @@
             }
 
             function FourthGhostMovement(){
-                return 1;
+                UpDistGhost4 = pythagorean(m_PacmanPosition.i - FourthGhostPosition.i, m_PacmanPosition.j - (FourthGhostPosition.j-1));
+                DownDistGhost4 = pythagorean(m_PacmanPosition.i - FourthGhostPosition.i, m_PacmanPosition.j - (FourthGhostPosition.j+1));
+                LeftDistGhost4 = pythagorean(m_PacmanPosition.i - (FourthGhostPosition.i-1), m_PacmanPosition.j - FourthGhostPosition.j);
+                RightDistGhost4 = pythagorean(m_PacmanPosition.i - (FourthGhostPosition.i+1), m_PacmanPosition.j - FourthGhostPosition.j);
+                //check for collision before moving
+                //and update dist to infinity so it will not choose it in case there is collision
+                if(board[FourthGhostPosition.i][FourthGhostPosition.j-1] == 4 || board[FourthGhostPosition.i][FourthGhostPosition.j-1] == 3 || board[FourthGhostPosition.i][FourthGhostPosition.j-1] == 5 || board[FourthGhostPosition.i][FourthGhostPosition.j-1] == 6 || board[FourthGhostPosition.i][FourthGhostPosition.j-1] == 10){
+                    UpDistGhost4 = Infinity;
+                }
+                if(board[FourthGhostPosition.i][FourthGhostPosition.j+1] == 4 || board[FourthGhostPosition.i][FourthGhostPosition.j+1] == 3 || board[FourthGhostPosition.i][FourthGhostPosition.j+1] == 5 || board[FourthGhostPosition.i][FourthGhostPosition.j+1] == 6 || board[FourthGhostPosition.i][FourthGhostPosition.j+1] == 10){
+                    DownDistGhost4 = Infinity;
+                }
+                if(board[FourthGhostPosition.i-1][FourthGhostPosition.j] == 4 || board[FourthGhostPosition.i-1][FourthGhostPosition.j] == 3 || board[FourthGhostPosition.i-1][FourthGhostPosition.j] == 5 || board[FourthGhostPosition.i-1][FourthGhostPosition.j] == 6 || board[FourthGhostPosition.i-1][FourthGhostPosition.j] == 10){
+                    LeftDistGhost4 = Infinity;
+                }
+                if(board[FourthGhostPosition.i+1][FourthGhostPosition.j] == 4 || board[FourthGhostPosition.i+1][FourthGhostPosition.j] == 3 || board[FourthGhostPosition.i+1][FourthGhostPosition.j] == 5 || board[FourthGhostPosition.i+1][FourthGhostPosition.j] == 6 || board[FourthGhostPosition.i+1][FourthGhostPosition.j] == 10){
+                    RightDistGhost4 = Infinity;
+                }
+                PrefferdDirection4 = GetPrefDir(UpDistGhost4, DownDistGhost4, LeftDistGhost4, RightDistGhost4, GhostFourDirection);
+
+                if(PrefferdDirection4.localeCompare("UP") == 0){
+                    board[FourthGhostPosition.i][FourthGhostPosition.j] = m_GhostFourPrev;
+                    m_GhostFourPrev = board[FourthGhostPosition.i][FourthGhostPosition.j-1];
+                    FourthGhostPosition.j--;
+                    board[FourthGhostPosition.i][FourthGhostPosition.j]=10;
+                    GhostFourDirection = "UP";
+                }
+                if(PrefferdDirection4.localeCompare("DOWN") == 0){
+                    board[FourthGhostPosition.i][FourthGhostPosition.j] = m_GhostFourPrev;
+                    m_GhostFourPrev = board[FourthGhostPosition.i][FourthGhostPosition.j+1];
+                    FourthGhostPosition.j++;
+                    board[FourthGhostPosition.i][FourthGhostPosition.j]=10;
+                    GhostFourDirection = "DOWN";
+                }
+                if(PrefferdDirection4.localeCompare("LEFT") == 0){
+                    board[FourthGhostPosition.i][FourthGhostPosition.j] = m_GhostFourPrev; //place the food back if there was one
+                    m_GhostFourPrev = board[FourthGhostPosition.i-1][FourthGhostPosition.j]; //keep whats in the tile before moving for later
+                    FourthGhostPosition.i--; //move LEFT
+                    board[FourthGhostPosition.i][FourthGhostPosition.j]=10; //Update
+                    GhostFourDirection = "LEFT";
+                }
+                if(PrefferdDirection4.localeCompare("RIGHT") == 0){
+                    board[FourthGhostPosition.i][FourthGhostPosition.j] = m_GhostFourPrev;
+                    m_GhostFourPrev = board[FourthGhostPosition.i+1][FourthGhostPosition.j];
+                    FourthGhostPosition.i++;
+                    board[FourthGhostPosition.i][FourthGhostPosition.j]=10;
+                    GhostFourDirection = "RIGHT";
+                }
+                if(m_GhostFourPrev==2){
+                    m_GhostFourPrev=0;
+                }
             }
 
             function pythagorean(sideA, sideB){
